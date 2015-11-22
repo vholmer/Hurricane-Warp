@@ -46,10 +46,10 @@ struct DataBaseHandler {
 	}
 
 	void createFile() {
-		ofstream wpnFile;
-		wpnFile.open(this->fileName);
-		wpnFile << this->doc;
-		wpnFile.close();
+		ofstream file;
+		file.open(this->fileName);
+		file << this->doc;
+		file.close();
 	}
 };
 
