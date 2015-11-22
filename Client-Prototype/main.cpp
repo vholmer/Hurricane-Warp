@@ -1,34 +1,45 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <list>
 
 #include "../rapidxml/rapidxml.hpp"
 #include "../rapidxml/rapidxml_print.hpp"
-
 
 using namespace rapidxml;
 
 using namespace std;
 
-struct XMLTest {
+struct DataBaseHandler {
 
+	xml_node<>* root;
 	xml_document<> doc;
-	const string fileName = "weapons.xml";
+	
+	const char* rootName;
+	const char* fileName;
 
-	void createWeaponXML() {
-		xml_node<>* weapons = this->doc.allocate_node(node_element, "weapons");
+	DataBaseHandler(const char* name) : rootName(name), fileName(name) {
+		xml_node<>* weapons = this->doc.allocate_node(node_element, this->rootName);
 		this->doc.append_node(weapons);
+		this->root = this->doc.first_node();
+	}
 
-		xml_node<>* wpn_sword = this->doc.allocate_node(node_element, "sword");
-		wpn_sword->append_attribute(this->doc.allocate_attribute("damage","12"));
-		weapons->append_node(wpn_sword);
+	xml_node<>* getNode(const char* targetNode) {
+		return this->root->first_node(targetNode);
+	}
 
-		xml_node<>* wpn_axe = this->doc.allocate_node(node_element, "axe");
-		wpn_axe->append_attribute(this->doc.allocate_attribute("damage","7"));
-		weapons->append_node(wpn_axe);
+	void setNode(const char* nodeName) {
+		xml_node<>* newNode = this->doc.allocate_node(node_element, nodeName);
+		this->root->append_node(newNode);
+	}
 
-		wpn_axe->value("An iron axe.");
-		wpn_sword->value("An ancient sword.");
+	void setAttribute(const char* targetNode, const char* attName, const char* attVal) {
+		xml_attribute<>* att = this->doc.allocate_attribute(attName, attVal);
+		getNode(targetNode)->append_attribute(att);
+	}
+
+	void setValue(const char* targetNode, const char* value) {
+		getNode(targetNode)->value(value);
 	}
 
 	void createFile() {
@@ -42,10 +53,15 @@ struct XMLTest {
 int main(int argc, char* argv[]) {
 	std::ios::sync_with_stdio(false);
 	cin.tie(0);
-
-	XMLTest xml;
-	xml.createWeaponXML();
-	xml.createFile();
+	
+	DataBaseHandler wpn("weapon");
+	wpn.setNode("sword");
+	wpn.setAttribute("sword", "damage", "15");
+	wpn.setNode("axe");
+	wpn.setAttribute("axe", "damage", "7");
+	wpn.setValue("axe", "A sharp iron axe.");
+	wpn.setValue("sword", "An ancient bronze sword.");
+	wpn.createFile();
 
 	return 0;
 }
