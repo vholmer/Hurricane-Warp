@@ -148,6 +148,7 @@ bool Client::start(int argc, char* argv[]) {
     test.wait();
     test2.wait();
     std::cout << "We are logging out" << std::endl;
+    return true;
 }
 
 
