@@ -29,3 +29,5 @@
 
 # Misc
 *.xml
+.DS_Store
+.out.dSYM
