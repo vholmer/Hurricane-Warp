@@ -11,7 +11,9 @@ xml_node<>* DataHandler::getNode(const char* targetNode) {
 }
 
 xml_attribute<>* DataHandler::getAttribute(const char* targetNode, const char* attName) {
-	return getNode(targetNode)->first_attribute(attName);
+	if(getNode(targetNode) != NULL)
+		return getNode(targetNode)->first_attribute(attName);
+	return NULL;
 }
 
 string DataHandler::getAttributeValue(const char* targetNode, const char* attName) {
@@ -35,12 +37,17 @@ void DataHandler::setNode(const char* nodeName) {
 }
 
 void DataHandler::setNode(const char* nodeName, const char* parentNode) {
-	
+	if(!nodeExists(nodeName)) {
+		xml_node<>* newNode = this->doc.allocate_node(node_element, nodeName);
+		getNode(parentNode)->append_node(newNode);
+	}
 }
 
 void DataHandler::setAttribute(const char* targetNode, const char* attName, const char* attVal) {
 	if(!attExists(targetNode, attName)) {
 		xml_attribute<>* att = this->doc.allocate_attribute(attName, attVal);
+		cout << "Allocated memory for " << targetNode << "'s attribute: " << attName << endl;
+		cout << targetNode << " == NULL: " << (getNode(targetNode) == NULL) << endl;
 		getNode(targetNode)->append_attribute(att);
 	} else if(attVal != getAttributeValue(targetNode, attName)) {
 		xml_attribute<>* att = getAttribute(targetNode, attName);

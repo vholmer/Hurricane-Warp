@@ -8,13 +8,14 @@
 
 #include "../rapidxml/rapidxml.hpp"
 #include "../rapidxml/rapidxml_print.hpp"
+#include "../rapidxml/rapidxml_utils.hpp"
 
 using namespace rapidxml;
 using namespace std;
 
 struct DataHandler {
-
 	xml_node<>* root;
+
 	xml_document<> doc;
 
 	const char* rootName;
