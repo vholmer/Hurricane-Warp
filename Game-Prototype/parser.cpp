@@ -3,5 +3,7 @@
 #include <string>
 
 string Parser::getCommand() {
-	return command[word::GO];
+	return this->command[word::GO];
 }
+
+//TODO efter dusch: fixa parsern och loopen!

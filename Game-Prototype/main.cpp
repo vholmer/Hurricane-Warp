@@ -1,7 +1,7 @@
 #include "engine.hpp"
 
 int main(void) {
-	Engine* game = new Engine();
-	game->startGameLoop();
+	Engine game;
+	game.startGameLoop();
 	return 0;
 }

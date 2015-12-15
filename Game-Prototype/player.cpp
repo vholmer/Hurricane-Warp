@@ -1,5 +1,5 @@
 #include "player.hpp"
 
 Player::Player() {
-	hitPoints = 10;
+	this->hitPoints = 10;
 }
