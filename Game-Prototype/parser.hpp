@@ -12,16 +12,18 @@
 
 using namespace std;
 
-const int GO = 1;
-const int LOOK = 2;
-const int HELP = 3;
-const int QUIT = 4;
-
 struct Parser {
+
+	enum class cmd : int {
+		GO = 1,
+		LOOK,
+		HELP,
+		QUIT
+	};
 
 	Player* player;
 
-	unordered_map<string, int> commands;
+	unordered_map<string, cmd> commands;
 
 	Parser(Player* player);
 

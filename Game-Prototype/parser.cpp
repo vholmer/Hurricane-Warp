@@ -6,10 +6,10 @@ Parser::Parser(Player* player) {
 }
 
 void Parser::setUpCommands() {
-	this->commands["go"] = GO; 
-	this->commands["look"] = LOOK;
-	this->commands["help"] = HELP;
-	this->commands["quit"] = QUIT;
+	this->commands["go"] = cmd::GO; 
+	this->commands["look"] = cmd::LOOK;
+	this->commands["help"] = cmd::HELP;
+	this->commands["quit"] = cmd::QUIT;
 }
 
 vector<string> Parser::getInput() {
@@ -42,19 +42,25 @@ bool Parser::processCommand() {
 	vector<string> input = getInput();
 
 	string firstWord = toLowerCase(input[0]);
-	cout << "firstWord: " << firstWord << endl;
+	string secondWord;
+	if(input.size() >= 2)
+		secondWord = toLowerCase(input[1]);
 
 	switch(commands[firstWord]) {
-		case GO:
-			cout << "Command go!" << endl;
+		case cmd::GO:
+			if(input.size() < 2) {
+				cout << "Go where?" << endl;
+				break;
+			}
+			cout << secondWord << endl;
 			break;
-		case LOOK:
+		case cmd::LOOK:
 			cout << "Command look!" << endl;
 			break;
-		case HELP:
+		case cmd::HELP:
 			cout << "God can't help you now!" << endl;
 			break;
-		case QUIT:
+		case cmd::QUIT:
 			return true;
 		default:
 			cout << "What do you mean?" << endl;
