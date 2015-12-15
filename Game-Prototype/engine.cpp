@@ -8,11 +8,13 @@ Engine::Engine() {
 	quitBoolean = false;
 	parser = new Parser();
 	player = new Player();
+	roomHandler = new RoomHandler();
 }
 
 void Engine::memHandle() {
 	delete parser;
 	delete player;
+	delete roomHandler;
 }
 
 void Engine::printIntro() {
@@ -22,6 +24,8 @@ void Engine::printIntro() {
 
 void Engine::startGameLoop() {
 	printIntro();
+	player->currentRoom = roomHandler->start();
+	cout << player->currentRoom->description << endl;
 }
 
 void Engine::quitGame() {

@@ -1,3 +1,6 @@
+#ifndef PARSER_HPP
+#define PARSER_HPP
+
 #include <string>
 
 using namespace std;
@@ -14,3 +17,5 @@ struct Parser {
 
 	string getCommand();
 };
+
+#endif
