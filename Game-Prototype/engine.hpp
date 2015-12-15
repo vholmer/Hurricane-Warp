@@ -5,7 +5,6 @@
 #include "player.hpp"
 
 struct Engine {
-	bool quitBoolean;
 	Parser* parser;
 	Player* player;
 	RoomHandler* roomHandler;
@@ -21,8 +20,6 @@ struct Engine {
 	void printIntro();
 
 	void startGameLoop();
-
-	void quitGame();
 
 	void respawn();
 };

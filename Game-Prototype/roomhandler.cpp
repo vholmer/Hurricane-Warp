@@ -24,11 +24,11 @@ RoomHandler::RoomHandler() {
 		string("Milk")
 		);
 
-	startRoom->itemsInRoom.push_back(knife);
+	startRoom->addItem(knife);
 	startRoom->exits[EAST] = clearing;
-	gameMap.push_back(startRoom);
+	this->gameMap.push_back(startRoom);
 
-	clearing->itemsInRoom.push_back(milk);
+	clearing->addItem(milk);
 	clearing->exits[WEST] = startRoom;
 	this->gameMap.push_back(clearing);
 }

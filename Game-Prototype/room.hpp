@@ -22,6 +22,8 @@ struct Room {
 	Room(string description);
 
 	void addItem(Item* item);
+
+	void removeItem(Item* item);
 };
 
 #endif

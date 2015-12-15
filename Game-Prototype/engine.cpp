@@ -5,9 +5,8 @@
 using namespace std;
 
 Engine::Engine() {
-	this->quitBoolean = false;
-	this->parser = new Parser();
 	this->player = new Player();
+	this->parser = new Parser(this->player);
 	this->roomHandler = new RoomHandler();
 }
 
@@ -47,10 +46,12 @@ void Engine::startGameLoop() {
 	}
 	cout << endl;
 	*/
-}
 
-void Engine::quitGame() {
-	this->quitBoolean = true;
+	bool gameOver = false;
+
+	while(!gameOver) {
+		gameOver = parser->processCommand();
+	}
 }
 
 void Engine::respawn() {
