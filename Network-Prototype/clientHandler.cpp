@@ -1,8 +1,4 @@
-
 #include "clientHandler.hpp"
-
-using namespace std;
-
 
 //Error handling
 void client_error(const char *msg)
@@ -21,32 +17,33 @@ string ClientHandler::calculateIP(struct sockaddr_in &cli_addr) const {
 /*
 	The process that handles all output from the clienthandler
 */
-void ClientHandler::outProcess(int sock) {
+void ClientHandler::outProcess(int socket) {
+	while(1) {
 	int n;
    	char buffer[256];
    	fd_set set;
     struct timeval timeout;
+	std::cout << "Writing hello" << std::endl;
+	if(kill_everythread.load()) {
 
-	while(1) 
+		close(socket);
+		return;
+		//int tmp = htonl((unsigned int) ClientInput::CloseConnection);
+		//write(socket, &tmp, sizeof(tmp));
+	} else {
+		n = SendInt((unsigned int) MessageCode::PlayerMessage, socket);
+		//n = write(sock,"Hello, I'm a server, and I am very much alive",45);
+	}
+
+	if (n < 0) 
 	{
+		std::cout << "Error when Writing" << std::endl;
+		close(socket);
+		return;
+	}
 
-   		if(kill_everythread.load()) 
-   		{
-   			close(sock);
-   			break;
-   		}
-
-   		std::cout << "Writing hello" << std::endl;
-		n = write(sock,"Hello, I'm a server, and I am very much alive",45);
-
-	   	if (n < 0) 
-	   	{
-	   		std::cout << "Error when Writing" << std::endl;
-	   		close(sock);
-	   		return;
-	   	}
-
-	   	usleep(4000000);
+	usleep(5000000);
+	
 	}
 }
 
@@ -54,8 +51,6 @@ void ClientHandler::outProcess(int sock) {
 	Handles the input
 */
 void ClientHandler::inProcess(int sock) {
-	int n;
-   	char buffer[256];
    	fd_set set;
     struct timeval timeout;
 
@@ -66,10 +61,8 @@ void ClientHandler::inProcess(int sock) {
    			break;
    		}
 
-   		bzero(buffer,256); // empty buffer
 		FD_ZERO(&set); /* clear the set */
 		FD_SET(sock, &set); /* add our file descriptor to the set */
-
 		timeout.tv_sec = 5; // set timer to 2 sec
 		timeout.tv_usec = 0; // set return signal
    		
@@ -77,28 +70,44 @@ void ClientHandler::inProcess(int sock) {
    		 NULL, &timeout);
 
    		if(ret != 0) {
-   			n = read(sock,buffer,255);
-
-		   	if (n < 0) {
-		   		std::cout << "Error when reading socket" << std::endl;
-		   		std::cout << "Closing the connection" << std::endl;
-		   		kill_everythread = true;
-		   		close(sock);
-		   		return;
-		   	}
-
-		   	if(n == 0) {
-		   		std::cout << "We got an empty package, something is wrong, abort" << std::endl; // test
-		   		close(sock);
-		   		return;
-		   	}
-
-		   	std::cout << "Client said:";
-		   	std::cout << buffer << std::endl;
+   			HandleInput(socket);
    		} 
    		else {
    			std::cout << "Client is idle" << std::endl;
    		}
+	}
+}
+
+
+void ClientHandler::HandleInput(int socket) {
+	int n;
+	int read;
+	n = ReadInt(&read, socket);
+	if(n < 0) return;
+	MessageCode code = (MessageCode) read;
+
+	switch (code) {
+		case MessageCode::Default :
+			std::cout << "Default" << std::endl;
+			break;
+		case MessageCode::RoomMessage :
+			std::cout << "Room" << std::endl;
+			break;
+		case MessageCode::AttackMessage :
+			std::cout << "Attack" << std::endl;
+			break;
+		case MessageCode::EnemyMessage :
+			std::cout << "Enemy" << std::endl;
+			break;
+		case MessageCode::PlayerMessage :
+			std::cout << "Player" << std::endl;
+			break;
+		case MessageCode::MessageMessage :
+			std::cout << "MessageMessage" << std::endl;
+			break;
+		case MessageCode::ConnectionLost :
+			std::cout << "End connection" << std::endl;
+			this->endConnection();
 	}
 }
 
@@ -133,9 +142,11 @@ bool ClientHandler::start(int sock, struct sockaddr_in &cli_addr) {
 */
 bool ClientHandler::endConnection() {
 	if(this->canBeEnded()) {
+		int end = (int) MessageCode::ConnectionLost;
+		SendInt(end, this->socket);
 		kill_everythread = true;
+		out_thr.wait();
 		in_thr.wait();
-		out_thr.get();
 		close(socket.load()); // close socket
 		return true;
 	} else {

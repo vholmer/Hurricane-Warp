@@ -1,4 +1,3 @@
-
 #ifndef CLIENT_H
 #define CLIENT_H
 
@@ -19,6 +18,10 @@
 #include <queue>
 #include <mutex>
 
+#include "../Game-Prototype/room.hpp"
+#include "../Network-Prototype/socket.hpp"
+#include "../Network-Prototype/network.hpp"
+
 using namespace std;
 
 volatile atomic<std::queue<std::string>> input_queue(std::queue<std::string>());
@@ -34,6 +37,8 @@ class Client {
 	private:
 		atomic<bool> kill_everythread;
 
+		char buffer [500];
+
 		int sockfd;
 		int portno;
 		struct sockaddr_in serv_addr;
@@ -42,22 +47,30 @@ class Client {
 		future<void> input_thread;
 		future<void> output_thread;
 
-		queue<string> incoming;
-		queue<string> outgoing;
+		vector<int> requestList;
+		queue<NetworkStruct> incoming;
+		queue<NetworkStruct> outgoing;
 
-		void send_process(int socket);
+		void read_process(int socket);
+		void sendProcess(int socket);
 		void client_process(int socket);
 		void send(int socket, std::string s);
 
-		mutex mtx;
+		mutex output_mutex;
 
-
+		unsigned int requestNumber;
 
 	public:
 		/*
 			
 		*/
 		Client();
+
+		unsigned int getNextRequestID();
+		
+		void HandleInput(int socket);
+
+		void EndConnection(int socket);
 
 		/*
 			Start client
@@ -68,6 +81,9 @@ class Client {
 			End client
 		*/
 		bool end();
+
+
+		Room requestRoom(int roomID);
 
 };
 #endif

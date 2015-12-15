@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "network.hpp"
 
 #include <chrono>
 #include <future>   
@@ -17,7 +18,11 @@
 #include <unistd.h>
 #include <atomic>
 
+#include "socket.hpp"
+
 using namespace std;
+
+using namespace Socket;
 
 class ClientHandler {
 
@@ -54,6 +59,8 @@ class ClientHandler {
 		(the socket needs to have been accepted)
 		*/
 		ClientHandler();
+
+		void HandleInput(int socket);
 
 		/*
 		Returns true if the connections has been established

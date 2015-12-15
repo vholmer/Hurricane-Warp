@@ -1,6 +1,5 @@
 #include "server.hpp"
 
-
 void server_error(const char *msg)
 {
     perror(msg);
@@ -11,9 +10,7 @@ void Server::client_listener() {
 	int newsockfd;
 	socklen_t clilen;
     struct sockaddr_in cli_addr;
-
 	listen(sockfd,5);
-    
     clilen = sizeof(cli_addr);
    	fd_set set;
     struct timeval timeout;
@@ -23,10 +20,8 @@ void Server::client_listener() {
     	if(kill_everythread.load()) { // return from function
         	break;
         }
-
     	FD_ZERO(&set); /* clear the set */
     	FD_SET(sockfd, &set); /* add our file descriptor to the set */
-
     	timeout.tv_sec = 1; // Sert timeout to 1 sec
     	timeout.tv_usec = 0; // set return signal to 0
 
@@ -35,12 +30,8 @@ void Server::client_listener() {
      	if(rv < 0) {
      		server_error("Error when selecting");
      	}
-        else if (rv == 0) { // timeout		        	
-        	//std::cout << "Timeout occured" << std::endl;
-        }
-        else {
+        else if(rv > 0) {
          	newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr, &clilen);
-
          	if (newsockfd < 0) 
              	server_error("ERROR on accept");
          	else {
@@ -51,15 +42,11 @@ void Server::client_listener() {
          		this->client_list.push_back(cl);
          		this->list_mutex.unlock();
          	}
-        
         }
-
     }
-
 }
 
 Server::Server() : client_list() , kill_everythread(false){
-
 }
 
 bool Server::start(char* c) {
