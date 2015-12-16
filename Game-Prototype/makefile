@@ -10,5 +10,7 @@ all:
 	g++ -std=c++11 $(files)
 
 clean:
+	rm -rf *.out.dSYM
 	rm *.hpp.gch
 	rm *.out
+
