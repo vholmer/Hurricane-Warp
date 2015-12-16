@@ -48,14 +48,20 @@ bool Parser::processCommand() {
 
 	switch(commands[firstWord]) {
 		case cmd::GO:
-			if(input.size() < 2) {
+			if(input.size() != 2) {
 				cout << "Go where?" << endl;
 				break;
 			}
-			cout << secondWord << endl;
+			if(player->currentRoom->exits[secondWord] != 0) {
+				Room* nextRoom = player->getExits(secondWord);
+				player->currentRoom = nextRoom;
+				player->roomInfo();
+			} else {
+				cout << "You can't go there." << endl;
+			}
 			break;
 		case cmd::LOOK:
-			cout << "Command look!" << endl;
+			player->roomInfo();
 			break;
 		case cmd::HELP:
 			cout << "God can't help you now!" << endl;

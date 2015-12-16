@@ -23,29 +23,16 @@ void Engine::memHandle() {
 }
 
 void Engine::printIntro() {
-	cout << "You have crashed on a mysterious planet!" << endl;
+	cout << endl << "You have crashed on a mysterious planet!" << endl;
 	cout << "In the name of the Emperor, good luck." << endl;
-	cout << "What do you do?" << endl << endl;
+	cout << "What do you do?" << endl;
 }
 
 void Engine::startGameLoop() {
 	//TODO: make this a lot less complicated, especially room / item descr.
 	printIntro();
 	this->player->currentRoom = this->roomHandler->start();
-	
-	/*
-	cout << this->player->currentRoom->description << endl;
-	cout << "Items in room: ";
-	for(Item* item : this->player->currentRoom->itemsInRoom) {
-		cout << item->name << " ";
-	}
-	cout << endl;
-	cout << "Exits: ";
-	for(pair<string, Room*> p : this->player->currentRoom->exits) {
-		cout << p.first << " ";
-	}
-	cout << endl;
-	*/
+	this->player->roomInfo();
 
 	bool gameOver = false;
 

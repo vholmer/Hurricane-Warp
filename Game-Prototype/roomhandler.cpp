@@ -8,18 +8,20 @@ RoomHandler::RoomHandler() {
 	// This method will initiate all rooms
 	// How to initiate a room:
 
-	Room* startRoom = new Room(string(
+	Room* startRoom = new Room(1,
+		string(
 		"You are in a dark forest."
 		));
-	Item* knife = new Item(
+	Item* knife = new Item(1,
 		string("A very sharp knife."),
 		string("Knife")
 		);
 
-	Room* clearing = new Room(string(
+	Room* clearing = new Room(2,
+		string(
 		"You are in a small clearing. There is a red house here."
 		));
-	Item* milk = new Item(
+	Item* milk = new Item(2,
 		string("A sealed jar of milk."),
 		string("Milk")
 		);
@@ -34,5 +36,5 @@ RoomHandler::RoomHandler() {
 }
 
 Room* RoomHandler::start() {
-	return this->gameMap[1];
+	return this->gameMap[0];
 }

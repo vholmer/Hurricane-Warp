@@ -9,17 +9,18 @@
 
 using namespace std;
 
-const string NORTH = "North";
-const string EAST = "East";
-const string SOUTH = "South";
-const string WEST = "West";
+const string NORTH = "north";
+const string EAST = "east";
+const string SOUTH = "south";
+const string WEST = "west";
 
 struct Room {
+	int roomID;
 	string description;
 	vector<Item*> itemsInRoom;
 	unordered_map<string, Room*> exits;
 	//vector<Character> charsInRoom;
-	Room(string description);
+	Room(int id, string description);
 
 	void addItem(Item* item);
 

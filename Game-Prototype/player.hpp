@@ -2,6 +2,7 @@
 #define PLAYER_HPP
 
 #include <vector>
+#include <iostream>
 
 #include "item.hpp"
 #include "roomhandler.hpp"
@@ -14,6 +15,10 @@ struct Player {
 	int hitPoints;
 
 	Player();
+
+	Room* getExits(string dir);
+
+	void roomInfo();
 };
 
 #endif
