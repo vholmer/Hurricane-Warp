@@ -1,36 +1,24 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-enum class ClientOutput : unsigned int{
-	SendInt,
-	SendAsciiString,
-	SendMessage,
-	SendPlayerAction,
-	RequestRoomInfo,
-	RequestPlayerInfo,
-	ConnectionLost = 0xffffffff,
-};
+#include "socket.hpp"
 
-enum class ClientInput : unsigned int {
-	ReceivingInteger,
-	ReceivingString,
-	RoomInfo,
-	ItemInfo,
-	PlayerInfo,
-	PlayerAction,
-	CloseConnection = 0xffffffff,
-};
+using namespace Socket;
+
+namespace Network {
 
 enum class MessageCode : unsigned int {
 	Default,
 	RoomMessage,
 	AttackMessage,
 	EnemyMessage,
+	MoveMessage,
+	DeathMessage,
 	PlayerMessage,
 	MessageMessage,
 	SpawnMessage,
 	DropMessage,
-	ConnectionLost = 0xffffffff
+	ConnectionLost
 };
 
 enum class PlayerAction : unsigned int {
@@ -50,84 +38,64 @@ struct NetworkStruct {
 	MessageCode code;
 };
 
-/*
+
 //-------------------------------------------------//
 //Room info
 //-------------------------------------------------//
-struct RoomServerStruct : NetworkStruct {
-	RoomInfo () {code = MessageCode::MessageMessage;}
+struct RoomStruct : NetworkStruct {
+	RoomStruct () {code = MessageCode::RoomMessage;}
 	int id;
 };
 
-struct PlayerClientStruct : NetworkStruct {
-	PlayerClientStruct() {code = MessageCode::PlayerMessage;}
+struct RoomClientStruct : NetworkStruct {
+	RoomClientStruct() {code = MessageCode::PlayerMessage;}
 };
 
-void SendRoomInfo(RoomInfo& str, int socket) {
-	SendInt((unsigned int)str.code, socket); // Send the op code
-	SendInt(str.requestID, socket); // Send the requestID
-	SendInt(str, socket);
-}
+int SendRoomStruct(RoomStruct& strc, int socket);
 
-RoomServerStruct ReceiveRoomInfo(int socket) {
-	RoomServerStruct str;
-	return str;
-}
+int ReadRoomStruct(RoomStruct& strc, int socket);
 
 
 //-------------------------------------------------/
 // Attack
 //-------------------------------------------------//
-struct AttackServerStruct : NetworkStruct{
-	AttackServerStruct() {code = MessageCode::AttackMessage;}
+struct AttackStruct : NetworkStruct{
+	AttackStruct() {code = MessageCode::AttackMessage;}
 	int attackerID;
-	int enemyID;
 	int targetID;
 	int damage;
 };
 
-struct PlayerClientStruct : NetworkStruct {
-	PlayerClientStruct() {code = MessageCode::PlayerMessage;}
+struct AttackClientStruct : NetworkStruct {
+	AttackClientStruct() {code = MessageCode::PlayerMessage;}
 };
 
-void SendAttackInfo(AttackInfo& str, int socket) {
+int ReadAttackStruct(AttackStruct& strc, int socket) ;
 
-}
-
-AttackServerStruct ReceiveAttackInfo(int socket) {
-	AttackServerStructstr;
-	return str;
-}
+int SendAttackStruct(AttackStruct& strc, int socket);
 
 //-------------------------------------------------//
 //Enemy info
 //-------------------------------------------------//
-struct EnemyServerStruct : NetworkStruct{
-	EnemyServerStruct() {code = MessageCode::EnemyMessage;}
+struct EnemyStruct : NetworkStruct{
+	EnemyStruct() {code = MessageCode::EnemyMessage;}
 	int id;
 	int attackPoint;
 };
 
-struct PlayerClientStruct : NetworkStruct {
-	PlayerClientStruct() {code = MessageCode::PlayerMessage;}
+struct EnemyClientStruct : NetworkStruct {
+	EnemyClientStruct() {code = MessageCode::PlayerMessage;}
 };
 
-void SendEnemyInfo(EnemyInfo str, int socket) {
-	SendInt((unsigned int)str.code, socket);
-	SendInt(str.requestID, socket);
-	SendInt(str.enemyID, socket);
-}
+int SendEnemyStruct(EnemyStruct& strc, int socket);
 
-EnemyServerStructReceiveEnemyInfo(int socket) {
-	EnemyServerStruct str;
-	return str;
-}
+int ReadEnemyStruct(EnemyStruct& strc, int socket);
 
 //-------------------------------------------------//
 //Spawn
 //-------------------------------------------------//
-struct SpawnServerStruct : NetworkStruct {
-	SpawnInfo() {code = MessageCode::SpawnMessage;}
+struct SpawnStruct : NetworkStruct {
+	SpawnStruct() {code = MessageCode::SpawnMessage;}
 	int roomID;
 	int monsterID;
 };
@@ -136,58 +104,48 @@ struct SpawnClientStruct : NetworkStruct {
 	SpawnClientStruct() {code = MessageCode::SpawnMessage;}
 };
 
-void SendSpawnInfo(SpawnInfo& str, int socket) {
-	
-}
+int SendSpawnStruct(SpawnStruct& strc, int socket);
 
-SpawnServerStruct ReceiveSpawn(int socket) {
-	SpawnServerStruct str;
-	return str;
-}
+int ReadSpawnStruct(SpawnStruct& strc, int socket);
+
 //-------------------------------------------------//
 //Player
 //-------------------------------------------------//
-struct PlayerServerStruct : NetworkStruct{
-	PlayerServerStruct() {code = MessageCode::PlayerMessage;}
+struct PlayerStruct : NetworkStruct{
+	PlayerStruct() {code = MessageCode::PlayerMessage;}
 	int id;
-	char* name;
 	int namesize;
+	char* name;
 };
 
 struct PlayerClientStruct : NetworkStruct {
 	PlayerClientStruct() {code = MessageCode::PlayerMessage;}
 };
-void SendPlayerInfo(PlayerInfo& str, int socket) {
 
-}
+int SendPlayerStruct(PlayerStruct& strc, int socket);
 
-PlayerServerStruct ReceivePlayerInfo(int socket) {
-	PlayerServerStructstr;
-	return str;
-}
-
+int ReadPlayerStruct(PlayerStruct& strc, int socket);
 //-------------------------------------------------//
 //Message
 //-------------------------------------------------//
-struct MessageServerStruct : NetworkStruct{
-	MessageServerStruct() {code = MessageCode::MessageMessage;}
+struct MessageStruct : NetworkStruct{
+	MessageStruct() {code = MessageCode::MessageMessage;}
 	int senderID;
 	int receiverID;
-	char* text;
 	int textSize;
+	char* text;
 };
 
 struct MessageClientStruct : NetworkStruct {
 	MessageClientStruct() {code = MessageCode::MessageMessage;}
 };
 
-void SendMessage(MessageMessage& str, int socket) {
+int ReadMessageStruct(MessageStruct& strc, int socket);
+
+int SendMessageStruct(MessageStruct& strc, int socket);
+
+
+//----------------------------------------------------
 
 }
-
-MessageServerStruct ReceiveMessage(int socket) {
-	MessageServerStruct str;
-	return str;
-} 
-*/
 #endif

@@ -1,3 +1,6 @@
+#ifndef SOCKET_H
+#define SOCKET_H
+
 #include "socket.hpp"
 
 namespace Socket {
@@ -39,12 +42,14 @@ namespace Socket {
     }
 
     int SendString(char* str, int length, int socket) {
+        
         int n = SendInt(length, socket);
         
         if(n != 0) {
     		return -1;
     	}
-        std::cout << "IN Send string" << std::endl;
+        std::cout << "In Send string" << std::endl;
+        std::cout << "Sending: " << str << std::endl;
 
     	int left = length;
         int rc;
@@ -66,10 +71,14 @@ namespace Socket {
             std::cout << "IN loop" << std::endl;
             rc = read(socket, str + length - left, left);
             std::cout << "yo" << std::endl;
-            if (rc < 0) return -1;
+            if (rc < 0)  {
+                std::cout << "Something went realy wrong" << std::endl;
+                return -1;
+            }
             left -= rc;
         }
-        std::cout << "We're done here" << std::endl;
+        std::cout << "We're read this string" << str << std::endl;
         return 0;
     }
 }
+#endif

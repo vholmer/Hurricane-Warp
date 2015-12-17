@@ -38,7 +38,6 @@ class ClientHandler {
 		bool started; // set to true when connection is established
 
 		atomic<bool> kill_everythread; // set to true when we want all processes to end themselves
-
 		/*
 		Calculate the ip with the help of a socket struct
 		*/
@@ -77,6 +76,9 @@ class ClientHandler {
 		returns true if connection was properly closed
 		*/
 		bool endConnection();
+
+
+		bool quitConnection();
 
 		/*
 		Returns true if the client handler can be endd

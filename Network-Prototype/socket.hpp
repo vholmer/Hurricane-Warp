@@ -15,13 +15,14 @@
 
 namespace Socket {
     
-    int SendInt(int, int);
+    //
+    int SendInt(int i, int socket);
 
-    int ReadInt(int*, int);
+    int ReadInt(int* i, int socket);
 
-    int SendString(char*, int length, int sock);
+    int SendString(char* string, int length, int sock);
 
-    int ReadString(char*, int length, int sock);
+    int ReadString(char* string, int length, int sock);
 }
 
 #endif

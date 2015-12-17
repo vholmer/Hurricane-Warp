@@ -14,16 +14,18 @@ void Server::client_listener() {
     clilen = sizeof(cli_addr);
    	fd_set set;
     struct timeval timeout;
+    timeout.tv_sec = 1; // Sert timeout to 1 sec
+    timeout.tv_usec = 0; // set return signal to 0
     int rv;
 
     while(1) {
+    	
     	if(kill_everythread.load()) { // return from function
         	break;
         }
+
     	FD_ZERO(&set); /* clear the set */
     	FD_SET(sockfd, &set); /* add our file descriptor to the set */
-    	timeout.tv_sec = 1; // Sert timeout to 1 sec
-    	timeout.tv_usec = 0; // set return signal to 0
 
     	rv = select(sockfd + 1, &set, NULL, NULL, &timeout);
          
@@ -71,15 +73,20 @@ bool Server::start(char* c) {
 */
 bool Server::stop() {
 	kill_everythread = true; // This will kill all the threads
+	std::cout << "Waiting for thread starter" << std::endl;
 	thread_starter.wait(); // Wait for the thread to finish
+	std::cout << "Close socket" << std::endl;
 	close(this->sockfd); // close socket
 	this->list_mutex.lock(); // lock the list
+	std::cout << "locking list" << std::endl;
 	for(ClientHandler* c: client_list) {
-		(*c).endConnection(); // Kill all clients
+		std::cout << "Deletes clients" << std::endl;
+		(*c).quitConnection(); // Kill all clients
 		delete c; // delete list
 	}
 	this->list_mutex.unlock(); // unlock the list
 	return true; //TODO
+	std::cout << "Server is killed" << std::endl;
 }
 
 
@@ -111,6 +118,7 @@ int main(int argc, char*argv[]) {
 
 	    while(1) {
 	    	if(end_server.load()) {
+	    		std::cout << "Kill the server" << std::endl;
 	    		server.stop();
 	    		return 0;
 	    	}

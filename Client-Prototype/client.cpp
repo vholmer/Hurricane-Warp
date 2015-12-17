@@ -4,6 +4,8 @@ using namespace std;
 
 using namespace Socket;
 
+using namespace Network;
+
 /*
 	Thread which reads everything from the server
 */
@@ -30,11 +32,13 @@ void Client::read_process(int socket) {
    		if(ret != 0) {
 
 		   	HandleInput(socket);
+		   	/*
 		   	if (n < 0) {
 		   		std::cout << "Error when reading socket" << std::endl;
 		   		close(socket);
 		   		return;
 		   	}
+		   	*/
 
    		} 
    		
@@ -51,31 +55,85 @@ void Client::HandleInput(int socket) {
 	MessageCode code = (MessageCode) read;
 
 	switch (code) {
-		case MessageCode::Default :
+		case MessageCode::Default : {
 			std::cout << "Default" << std::endl;
 			break;
-		case MessageCode::RoomMessage :
+			}
+		case MessageCode::RoomMessage : {
 			std::cout << "Room" << std::endl;
+			RoomStruct strc;
+			ReadRoomStruct(strc, socket);
+			std::cout << "id:" << strc.id << std::endl;
 			break;
-		case MessageCode::AttackMessage :
+			}	
+		case MessageCode::AttackMessage : {
 			std::cout << "Attack" << std::endl;
+			AttackStruct strc;
+			ReadAttackStruct(strc, socket);
+			std::cout << "attacker:" << strc.attackerID << std::endl;
+			std::cout << "target:" << strc.targetID << std::endl;
+			std::cout << "damage:" << strc.damage << std::endl;
 			break;
-		case MessageCode::EnemyMessage :
+			}
+		case MessageCode::EnemyMessage : {
 			std::cout << "Enemy" << std::endl;
 			break;
-		case MessageCode::PlayerMessage :
+			}
+		case MessageCode::PlayerMessage : {
 			std::cout << "Player" << std::endl;
+			PlayerStruct strc;
+			strc.name = new char[1024]();
+			ReadPlayerStruct(strc, socket);
+			std::cout << "id:" << strc.id << std::endl;
+			std::cout << "name size:" << strc.namesize << std::endl;
+			std::cout << "name:" << strc.name << std::endl;
+			delete strc.name;
 			break;
-		case MessageCode::MessageMessage :
-			std::cout << "MessageMessage" << std::endl;
-			EndConnection(socket);
+			}
+		case MessageCode::MessageMessage :{
+			std::cout << "Message" << std::endl;
+			MessageStruct strc;
+			ReadMessageStruct(strc, socket);
+			std::cout << "Server said: " << std::endl;
+			std::cout << strc.text << std::endl; 
 			break;
+			}
+		case MessageCode::ConnectionLost : {
+			std::cout << "Shiiiiit" << std::endl;
+			std::cout << "Server is down" << std::endl;
+			n = SendInt((int)MessageCode::ConnectionLost, socket);
+			
+			if(n < 0) {
+				std::cout << "Something has gone completely wrong" << std::endl;
+				return;
+			}
+			endConnection();
+			break;
+			}
+		default : {
+			std::cout << "Random input" << std::endl;
+		}
 	}
 }
 
-void Client::EndConnection(int socket) {
+
+
+
+
+void Client::endConnection() {
+	this->kill_everythread = true;
+}
+
+void Client::quitConnection(int socket) {
 	int end = (int) MessageCode::ConnectionLost;
 	SendInt(end, socket);
+
+	int done = (int) MessageCode::ConnectionLost;
+	int ret = 0;
+	do {
+		ReadInt(&ret, socket);
+	} while(ret != done);
+		
 	this->kill_everythread = true;
 }
 
@@ -106,8 +164,6 @@ unsigned int Client::getNextRequestID() {
 	return (this->requestNumber)++;
 }
 
-
-
 /*
 	Send a string on a socket
 */
@@ -115,8 +171,18 @@ void Client::send(int socket, string s) {
 	std::copy(s.begin(), s.end(), buffer);
 	buffer[s.size()]=0;
 	std::cout << buffer << std::endl;
-	int message = (int) MessageCode::EnemyMessage;
-	SendInt(message, socket);
+	
+	/*MessageStruct strc;
+	strc.text = buffer;
+	strc.textSize = s.size() + 1;
+	SendMessageStruct(strc, socket);
+	*/
+	PlayerStruct strc;
+	strc.id = 1337;
+	char a [] = {'h', 'e', 'j', 0};
+	strc.namesize = 4;
+	strc.name = a;
+	int n = SendPlayerStruct(strc, socket);;
 }
 
 
@@ -149,8 +215,11 @@ void Client::client_process(int socket) {
 
 	    	if(s == "Exit") {
 	    		std::cout << "We are exiting" << std::endl;
-	    		this->kill_everythread = true;
+	    		
+	    		/*this->kill_everythread = true;
 	    		close(socket);
+	    		break;*/
+	    		this->quitConnection(socket);
 	    		break;
 	    	}
 	    	else {
@@ -216,11 +285,8 @@ bool Client::start(int argc, char* argv[]) {
 
 
 bool Client::end() {
-	return true; //TODO
+	return true; //TODO(Lukas)
 }
-
-
-
 
 
 int main(int argc, char* argv[]) {

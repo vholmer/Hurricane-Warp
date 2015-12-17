@@ -24,6 +24,10 @@
 
 using namespace std;
 
+using namespace Socket;
+
+using namespace Network;
+
 volatile atomic<std::queue<std::string>> input_queue(std::queue<std::string>());
 volatile atomic<std::queue<std::string>> output_queue(std::queue<std::string>());
 
@@ -70,7 +74,9 @@ class Client {
 		
 		void HandleInput(int socket);
 
-		void EndConnection(int socket);
+		void endConnection();
+
+		void quitConnection(int socket);
 
 		/*
 			Start client

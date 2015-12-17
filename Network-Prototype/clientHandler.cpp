@@ -1,5 +1,9 @@
 #include "clientHandler.hpp"
 
+using namespace Socket;
+
+using namespace Network;
+
 //Error handling
 void client_error(const char *msg)
 {
@@ -19,57 +23,58 @@ string ClientHandler::calculateIP(struct sockaddr_in &cli_addr) const {
 */
 void ClientHandler::outProcess(int socket) {
 	while(1) {
-	int n;
-   	char buffer[256];
-   	fd_set set;
-    struct timeval timeout;
-	std::cout << "Writing hello" << std::endl;
-	if(kill_everythread.load()) {
+		int n = 0;
+		if(kill_everythread.load()) {
+			close(socket);
+			return;
+		} 
+		else {
+			char buffer [1024];
+			std::string s = "日本国（にっぽんこく、にほんこく）、または日本（にっぽん、にほん）は、東アジアに位置する日本列島（北海道・本州・四国・九州の主要四島およびそれに付随する島々）及び、南西諸島・小笠原諸島などの諸島嶼から成る島国である[1]。日本語が事実上の公用語として使用されている。首都は事実上東京都とされている。";
+			std::copy(s.begin(), s.end(), buffer);
+			buffer[s.size()]=0;
+			std::cout << buffer << std::endl;
+			PlayerStruct strc;
+			strc.id = 1337;
+			strc.namesize = s.size() + 1;
+			strc.name = buffer;
+			int n = SendPlayerStruct(strc, socket);
+		}
 
-		close(socket);
-		return;
-		//int tmp = htonl((unsigned int) ClientInput::CloseConnection);
-		//write(socket, &tmp, sizeof(tmp));
-	} else {
-		n = SendInt((unsigned int) MessageCode::PlayerMessage, socket);
-		//n = write(sock,"Hello, I'm a server, and I am very much alive",45);
-	}
+		if (n < 0) {
+			std::cout << "Error when Writing" << std::endl;
+			close(socket);
+			return;
+		}
 
-	if (n < 0) 
-	{
-		std::cout << "Error when Writing" << std::endl;
-		close(socket);
-		return;
-	}
-
-	usleep(5000000);
-	
+		usleep(500000);
 	}
 }
 
 /*
 	Handles the input
 */
-void ClientHandler::inProcess(int sock) {
+void ClientHandler::inProcess(int socket) {
    	fd_set set;
     struct timeval timeout;
 
 	while(1) {
 
    		if(kill_everythread.load()) {
-   			close(sock);
+   			close(socket);
    			break;
    		}
 
 		FD_ZERO(&set); /* clear the set */
-		FD_SET(sock, &set); /* add our file descriptor to the set */
+		FD_SET(socket, &set); /* add our file descriptor to the set */
 		timeout.tv_sec = 5; // set timer to 2 sec
 		timeout.tv_usec = 0; // set return signal
    		
-   		int ret = select(sock + 1, &set, NULL,
+   		int ret = select(socket + 1, &set, NULL,
    		 NULL, &timeout);
 
    		if(ret != 0) {
+   			std::cout << "Gonna read" << std::endl;
    			HandleInput(socket);
    		} 
    		else {
@@ -86,28 +91,63 @@ void ClientHandler::HandleInput(int socket) {
 	if(n < 0) return;
 	MessageCode code = (MessageCode) read;
 
+	std::cout << "We got: " << read << std::endl;
+
 	switch (code) {
-		case MessageCode::Default :
+		case MessageCode::Default : {
 			std::cout << "Default" << std::endl;
 			break;
-		case MessageCode::RoomMessage :
+			}
+		case MessageCode::RoomMessage : {
 			std::cout << "Room" << std::endl;
+			RoomStruct strc;
+			ReadRoomStruct(strc, socket);
+			std::cout << "id:" << strc.id << std::endl;
 			break;
-		case MessageCode::AttackMessage :
+			}	
+		case MessageCode::AttackMessage : {
 			std::cout << "Attack" << std::endl;
+			AttackStruct strc;
+			ReadAttackStruct(strc, socket);
+			std::cout << "attacker:" << strc.attackerID << std::endl;
+			std::cout << "target:" << strc.targetID << std::endl;
+			std::cout << "damage:" << strc.damage << std::endl;
 			break;
-		case MessageCode::EnemyMessage :
+			}
+		case MessageCode::EnemyMessage : {
 			std::cout << "Enemy" << std::endl;
 			break;
-		case MessageCode::PlayerMessage :
+			}
+		case MessageCode::PlayerMessage : {
 			std::cout << "Player" << std::endl;
+			PlayerStruct strc;
+			strc.name = new char[1024]();
+			ReadPlayerStruct(strc, socket);
+			std::cout << "id:" << strc.id << std::endl;
+			std::cout << "name size:" << strc.namesize << std::endl;
+			std::cout << "name:" << strc.name << std::endl;
+			delete strc.name;			
 			break;
-		case MessageCode::MessageMessage :
-			std::cout << "MessageMessage" << std::endl;
+			}
+		case MessageCode::MessageMessage : {
+			std::cout << "Message" << std::endl;
+			MessageStruct strc;
+			ReadMessageStruct(strc, socket);
+			std::cout << "Server said: " << std::endl;
+			std::cout << strc.textSize << std::endl;
+			std::cout << strc.text << std::endl;  
 			break;
-		case MessageCode::ConnectionLost :
+			}
+		case MessageCode::ConnectionLost : {
 			std::cout << "End connection" << std::endl;
+			std::cout << "We are done here" << std::endl;
+			int i = (int) MessageCode::ConnectionLost;
+			SendInt(i, socket);
 			this->endConnection();
+			}
+		default : {
+			std::cout << "Random input" << std::endl;
+		}
 	}
 }
 
@@ -130,6 +170,7 @@ bool ClientHandler::isStarted() const{
 	Start up a connection
 */
 bool ClientHandler::start(int sock, struct sockaddr_in &cli_addr) {
+	kill_everythread = false;
 	this->socket = sock;
 	this->id = std::to_string(sock);
 	this->ip_adress = calculateIP(cli_addr);
@@ -141,17 +182,31 @@ bool ClientHandler::start(int sock, struct sockaddr_in &cli_addr) {
 	End the connection
 */
 bool ClientHandler::endConnection() {
-	if(this->canBeEnded()) {
-		int end = (int) MessageCode::ConnectionLost;
-		SendInt(end, this->socket);
 		kill_everythread = true;
 		out_thr.wait();
 		in_thr.wait();
-		close(socket.load()); // close socket
+		close(this->socket.load()); // close socket
+		std::cout << "Tråden är färdig" << std::endl;
 		return true;
-	} else {
-		return false;
-	}
+}
+
+bool ClientHandler::quitConnection() {
+		std::cout << "End connection" << std::endl;
+		if(kill_everythread.load()) {
+			out_thr.wait();
+			in_thr.wait();
+			return true;
+		}
+		int end = (int) MessageCode::ConnectionLost;
+		SendInt(end, this->socket.load());
+
+		int done = (int) MessageCode::ConnectionLost;
+		int ret = 0;
+		do {
+			ReadInt(&ret, this->socket);
+		} while(ret != done);
+
+		return this->endConnection();
 }
 
 /*
