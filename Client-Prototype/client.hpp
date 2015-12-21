@@ -22,6 +22,9 @@
 #include "../Network-Prototype/socket.hpp"
 #include "../Network-Prototype/network.hpp"
 
+#include <signal.h>
+
+
 using namespace std;
 
 using namespace Socket;
@@ -31,10 +34,19 @@ using namespace Network;
 volatile atomic<std::queue<std::string>> input_queue(std::queue<std::string>());
 volatile atomic<std::queue<std::string>> output_queue(std::queue<std::string>());
 
+int sock;
+
 void error(const char *msg)
 {
     perror(msg);
     exit(0);
+}
+
+
+void OnExit(int s) {
+	std::cout << "Exiting" << std::endl;
+	close(sock);
+	exit(1);
 }
 
 class Client {
@@ -74,7 +86,7 @@ class Client {
 		
 		void HandleInput(int socket);
 
-		void endConnection();
+		void endConnection(int socket);
 
 		void quitConnection(int socket);
 

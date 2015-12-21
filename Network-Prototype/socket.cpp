@@ -48,15 +48,15 @@ namespace Socket {
         if(n != 0) {
     		return -1;
     	}
-        std::cout << "In Send string" << std::endl;
-        std::cout << "Sending: " << str << std::endl;
+        //std::cout << "In Send string" << std::endl;
+        //std::cout << "Sending: " << str << std::endl;
 
     	int left = length;
         int rc;
         while (left) {
-            std::cout << "In loop" << std::endl;
+            //std::cout << "In loop" << std::endl;
             rc = write(socket, str + length - left, left);
-            std::cout << "We're done here" << std::endl;
+            //std::cout << "We're done here" << std::endl;
             if (rc < 0) return -1;
             left -= rc;
         }
@@ -66,18 +66,17 @@ namespace Socket {
     int ReadString(char* str, int length, int socket) {
     	int left = length;
         int rc;
-        std::cout << "IN Read string" << std::endl;
+        //std::cout << "IN Read string" << std::endl;
         while (left) {
-            std::cout << "IN loop" << std::endl;
+            //std::cout << "IN loop" << std::endl;
             rc = read(socket, str + length - left, left);
-            std::cout << "yo" << std::endl;
             if (rc < 0)  {
-                std::cout << "Something went realy wrong" << std::endl;
+               // std::cout << "Something went realy wrong" << std::endl;
                 return -1;
             }
             left -= rc;
         }
-        std::cout << "We're read this string" << str << std::endl;
+       // std::cout << "We're read this string" << str << std::endl;
         return 0;
     }
 }

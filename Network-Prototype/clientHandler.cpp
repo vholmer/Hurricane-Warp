@@ -7,6 +7,7 @@ using namespace Network;
 //Error handling
 void client_error(const char *msg)
 {
+	std::cout << "We got an error on our ass" << std::endl;
     perror(msg);
     exit(1);
 }
@@ -27,17 +28,13 @@ void ClientHandler::outProcess(int socket) {
 		if(kill_everythread.load()) {
 			close(socket);
 			return;
-		} 
-		else {
+		} else {
 			char buffer [1024];
 			std::string s = "日本国（にっぽんこく、にほんこく）、または日本（にっぽん、にほん）は、東アジアに位置する日本列島（北海道・本州・四国・九州の主要四島およびそれに付随する島々）及び、南西諸島・小笠原諸島などの諸島嶼から成る島国である[1]。日本語が事実上の公用語として使用されている。首都は事実上東京都とされている。";
-			std::copy(s.begin(), s.end(), buffer);
-			buffer[s.size()]=0;
-			std::cout << buffer << std::endl;
 			PlayerStruct strc;
+			SetContentCharArray(s, strc.name, strc.namesize);
 			strc.id = 1337;
 			strc.namesize = s.size() + 1;
-			strc.name = buffer;
 			int n = SendPlayerStruct(strc, socket);
 		}
 
@@ -50,7 +47,6 @@ void ClientHandler::outProcess(int socket) {
 		usleep(500000);
 	}
 }
-
 /*
 	Handles the input
 */
@@ -58,6 +54,7 @@ void ClientHandler::inProcess(int socket) {
    	fd_set set;
     struct timeval timeout;
 
+    this->clientDead = false;
 	while(1) {
 
    		if(kill_everythread.load()) {
@@ -67,27 +64,38 @@ void ClientHandler::inProcess(int socket) {
 
 		FD_ZERO(&set); /* clear the set */
 		FD_SET(socket, &set); /* add our file descriptor to the set */
-		timeout.tv_sec = 5; // set timer to 2 sec
+		timeout.tv_sec = 5; // set timer to 5 sec
 		timeout.tv_usec = 0; // set return signal
    		
    		int ret = select(socket + 1, &set, NULL,
    		 NULL, &timeout);
 
    		if(ret != 0) {
+   			clientDead = false;
    			std::cout << "Gonna read" << std::endl;
+   			std::cout << "Fuck" << std::endl;
    			HandleInput(socket);
+   			std::cout << "Done reading" << std::endl;
    		} 
    		else {
    			std::cout << "Client is idle" << std::endl;
+   			if(clientDead) {
+   				endConnection();
+   			} else {
+   				SendInt((int) MessageCode::StillThere, socket);
+   				clientDead = true;
+   			}
    		}
 	}
 }
 
-
 void ClientHandler::HandleInput(int socket) {
+	std::cout << "In handle input" << std::endl;
 	int n;
 	int read;
+	std::cout << "In more handle input" << std::endl;
 	n = ReadInt(&read, socket);
+	std::cout << "Trying to read" << std::endl;
 	if(n < 0) return;
 	MessageCode code = (MessageCode) read;
 
@@ -121,12 +129,10 @@ void ClientHandler::HandleInput(int socket) {
 		case MessageCode::PlayerMessage : {
 			std::cout << "Player" << std::endl;
 			PlayerStruct strc;
-			strc.name = new char[1024]();
 			ReadPlayerStruct(strc, socket);
 			std::cout << "id:" << strc.id << std::endl;
 			std::cout << "name size:" << strc.namesize << std::endl;
-			std::cout << "name:" << strc.name << std::endl;
-			delete strc.name;			
+			std::cout << "name:" << strc.name << std::endl;		
 			break;
 			}
 		case MessageCode::MessageMessage : {
@@ -138,12 +144,17 @@ void ClientHandler::HandleInput(int socket) {
 			std::cout << strc.text << std::endl;  
 			break;
 			}
+		case MessageCode::StillHere : {
+			this->clientDead = false;
+			break;
+			}
 		case MessageCode::ConnectionLost : {
 			std::cout << "End connection" << std::endl;
 			std::cout << "We are done here" << std::endl;
 			int i = (int) MessageCode::ConnectionLost;
 			SendInt(i, socket);
-			this->endConnection();
+			this->quitConnection();
+			break;
 			}
 		default : {
 			std::cout << "Random input" << std::endl;
@@ -183,8 +194,6 @@ bool ClientHandler::start(int sock, struct sockaddr_in &cli_addr) {
 */
 bool ClientHandler::endConnection() {
 		kill_everythread = true;
-		out_thr.wait();
-		in_thr.wait();
 		close(this->socket.load()); // close socket
 		std::cout << "Tråden är färdig" << std::endl;
 		return true;

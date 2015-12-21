@@ -74,6 +74,16 @@ int ReadSpawnStruct(SpawnStruct& strc, int socket) {
 //Message
 //-------------------------------------------------//
 
+PlayerStruct::PlayerStruct() {
+	code = MessageCode::PlayerMessage;
+	nameBufferSize = size;
+	name = new char[nameBufferSize]();
+}
+
+PlayerStruct::~PlayerStruct() {
+	delete [] name;
+}
+
 int SendPlayerStruct(PlayerStruct& strc, int socket) {
 	int n = SendInt((int)strc.code, socket);
 	n = SendInt(strc.id, socket);
@@ -92,6 +102,17 @@ int ReadPlayerStruct(PlayerStruct& strc, int socket) {
 //-------------------------------------------------//
 //Message
 //-------------------------------------------------//
+MessageStruct::MessageStruct(int size = 1024) {
+		code = MessageCode::MessageMessage;
+		requestID = 0;
+		textBufferSize = size;
+		text = new char[textBufferSize]();
+}
+
+MessageStruct::~MessageStruct() {
+	delete [] text;
+}
+
 int ReadMessageStruct(MessageStruct& strc, int socket) {
 	int n = ReadInt(&(strc.senderID), socket);
 	n = ReadInt(&(strc.receiverID), socket);
@@ -108,5 +129,16 @@ int SendMessageStruct(MessageStruct& strc, int socket) {
 	n = SendString(strc.text, strc.textSize, socket);
 	return n;
 }
+
+//---//
+int SetContentCharArray(std::string source, char * copytarget, int targetSize) {
+	if(source.size() >= targetSize) {
+		return -1;
+	}
+	std::copy(source.begin(), source.end(), copytarget);
+	copytarget[source.size()]=0;
+	return 0;
+}
+
 
 }

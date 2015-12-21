@@ -17,29 +17,20 @@ void Client::read_process(int socket) {
 
 	while(1) {
 
+		std::cout << "We are still in output" << std::endl;
+
 		if(kill_everythread.load()) {
    			break;
    		}
-   		//bzero(buffer,256); // empty buffer
 		FD_ZERO(&set); /* clear the set */
 		FD_SET(socket, &set); /* add our file descriptor to the set */
-
-		timeout.tv_sec = 2; // set timer to 2 sec
+		timeout.tv_sec = 2; // set time out time  to 2 sec
 		timeout.tv_usec = 0; // set return signal
    		
    		int ret = select(socket + 1, &set, NULL, NULL, &timeout);
 
    		if(ret != 0) {
-
 		   	HandleInput(socket);
-		   	/*
-		   	if (n < 0) {
-		   		std::cout << "Error when reading socket" << std::endl;
-		   		close(socket);
-		   		return;
-		   	}
-		   	*/
-
    		} 
    		
 	}
@@ -82,12 +73,15 @@ void Client::HandleInput(int socket) {
 		case MessageCode::PlayerMessage : {
 			std::cout << "Player" << std::endl;
 			PlayerStruct strc;
-			strc.name = new char[1024]();
 			ReadPlayerStruct(strc, socket);
 			std::cout << "id:" << strc.id << std::endl;
 			std::cout << "name size:" << strc.namesize << std::endl;
 			std::cout << "name:" << strc.name << std::endl;
-			delete strc.name;
+			break;
+			}
+		case MessageCode::StillThere : {
+			std::cout << "Server asked if  I am still here" << std::endl;
+			SendInt((int)MessageCode::StillHere, socket);
 			break;
 			}
 		case MessageCode::MessageMessage :{
@@ -99,7 +93,7 @@ void Client::HandleInput(int socket) {
 			break;
 			}
 		case MessageCode::ConnectionLost : {
-			std::cout << "Shiiiiit" << std::endl;
+			std::cout << "Damn" << std::endl;
 			std::cout << "Server is down" << std::endl;
 			n = SendInt((int)MessageCode::ConnectionLost, socket);
 			
@@ -107,7 +101,7 @@ void Client::HandleInput(int socket) {
 				std::cout << "Something has gone completely wrong" << std::endl;
 				return;
 			}
-			endConnection();
+			endConnection(socket);
 			break;
 			}
 		default : {
@@ -120,20 +114,25 @@ void Client::HandleInput(int socket) {
 
 
 
-void Client::endConnection() {
+void Client::endConnection(int socket) {
 	this->kill_everythread = true;
+	close(socket);
 }
 
 void Client::quitConnection(int socket) {
+	std::cout << "Send quit request to server" << std::endl;
 	int end = (int) MessageCode::ConnectionLost;
 	SendInt(end, socket);
 
+	std::cout << "Waiting for response" << std::endl;
 	int done = (int) MessageCode::ConnectionLost;
 	int ret = 0;
 	do {
 		ReadInt(&ret, socket);
 	} while(ret != done);
-		
+	SendInt(end, socket);
+	std::cout << "Kill the thread" << std::endl;
+	
 	this->kill_everythread = true;
 }
 
@@ -171,18 +170,12 @@ void Client::send(int socket, string s) {
 	std::copy(s.begin(), s.end(), buffer);
 	buffer[s.size()]=0;
 	std::cout << buffer << std::endl;
-	
-	/*MessageStruct strc;
-	strc.text = buffer;
-	strc.textSize = s.size() + 1;
-	SendMessageStruct(strc, socket);
-	*/
 	PlayerStruct strc;
 	strc.id = 1337;
-	char a [] = {'h', 'e', 'j', 0};
-	strc.namesize = 4;
-	strc.name = a;
-	int n = SendPlayerStruct(strc, socket);;
+	int i = SetContentCharArray(s, strc.name, strc.namesize);
+	//TODO(Lukas) note: Handle buffer size missmatch
+	int n = SendPlayerStruct(strc, socket); 
+	//TODO(Lukas) note: Handle error messages, in cases of failed send
 }
 
 
@@ -200,27 +193,22 @@ void Client::client_process(int socket) {
 
 		struct timeval tv;
 	    fd_set fds;
-	    tv.tv_sec = 5;
-	    tv.tv_usec = 0;
+	    tv.tv_sec = 3; // Set time out to 3 sec
+	    tv.tv_usec = 0; // Set return code to 0
 	    
-	    FD_ZERO(&fds);
+	    FD_ZERO(&fds); // empty fds
 	    FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
 
-	    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+	    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv); //wait for std:cin input or timeout
 	    int n = FD_ISSET(STDIN_FILENO, &fds);
 
-	    if(n != 0) {
+	    if(n != 0) { // if no timeout
 	    	string s;
 	    	cin >> s;
 
 	    	if(s == "Exit") {
 	    		std::cout << "We are exiting" << std::endl;
-	    		
-	    		/*this->kill_everythread = true;
-	    		close(socket);
-	    		break;*/
 	    		this->quitConnection(socket);
-	    		break;
 	    	}
 	    	else {
 	    		std::cout << "Got a string" << std::endl;
@@ -252,6 +240,7 @@ bool Client::start(int argc, char* argv[]) {
 
     this->portno = atoi(argv[2]); // Connec
     this->sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+    sock = sockfd;
 
     if (this->sockfd < 0) 
         error("ERROR opening socket");
@@ -290,6 +279,15 @@ bool Client::end() {
 
 
 int main(int argc, char* argv[]) {
+	
+	struct sigaction sigIntHandler;
+
+   	sigIntHandler.sa_handler = OnExit;
+   	sigemptyset(&sigIntHandler.sa_mask);
+   	sigIntHandler.sa_flags = 0;
+
+  	sigaction(SIGINT, &sigIntHandler, NULL);
+
 	Client c;
 	c.start(argc, argv); // Currently this is all that is neeeded
 }
