@@ -4,7 +4,7 @@ Player::Player() {
 	this->hitPoints = 10;
 }
 
-Room* Player::getExits(string dir) {
+Room* Player::getRoomInDir(string dir) {
 	return this->currentRoom->exits[dir];
 }
 
@@ -20,9 +20,6 @@ void Player::roomInfo() {
 	}
 	cout << endl;
 	cout << "Exits: ";
-	for(pair<string, Room*> p : this->currentRoom->exits) {
-		if(p.second != 0)
-			cout << p.first << " ";
-	}
+	cout << this->currentRoom->getExits();
 	cout << endl;
 }

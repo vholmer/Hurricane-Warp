@@ -16,7 +16,7 @@ struct Player {
 
 	Player();
 
-	Room* getExits(string dir);
+	Room* getRoomInDir(string dir);
 
 	unordered_map<string, Room*> getExitMap();
 

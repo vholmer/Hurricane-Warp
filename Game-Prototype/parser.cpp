@@ -13,8 +13,8 @@ void Parser::setUpLambdas() {
 			return false;
 		}
 		if(this->player->getExitMap().find(secondWord) != this->player->getExitMap().end()) {
-			if(this->player->getExits(secondWord) != 0) {
-				Room* nextRoom = this->player->getExits(secondWord);
+			if(this->player->getRoomInDir(secondWord) != 0) {
+				Room* nextRoom = this->player->getRoomInDir(secondWord);
 				this->player->currentRoom = nextRoom;
 				this->player->roomInfo();
 			}
