@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <map>
 #include <locale>
 
 #include "player.hpp"
@@ -24,9 +25,13 @@ struct Parser {
 
 	Player* player;
 
+	map<cmd, function<bool(string)> > funcMap;
+
 	unordered_map<string, cmd> commands;
 
 	Parser(Player* player);
+
+	void setUpLambdas();
 
 	void setUpCommands();
 

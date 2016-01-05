@@ -3,6 +3,45 @@
 Parser::Parser(Player* player) {
 	this->player = player;
 	setUpCommands();
+	setUpLambdas();
+}
+
+void Parser::setUpLambdas() {
+	funcMap[cmd::GO] = [this] (string secondWord = "") {
+		if(secondWord == "") {
+			cout << "Go where?" << endl;
+			return false;
+		}
+		if(this->player->getExitMap().find(secondWord) != this->player->getExitMap().end()) {
+			if(this->player->getExits(secondWord) != 0) {
+				Room* nextRoom = this->player->getExits(secondWord);
+				this->player->currentRoom = nextRoom;
+				this->player->roomInfo();
+			}
+		} else {
+			cout << "You can't go there." << endl;
+		}
+		return false;
+	};
+
+	funcMap[cmd::LOOK] = [this] (string secondWord = "") {
+		this->player->roomInfo();
+		return false;
+	};
+
+	funcMap[cmd::HELP] = [this] (string secondWord = "") {
+		cout << "God can't help you now!" << endl;
+		return false;
+	};
+
+	funcMap[cmd::QUIT] = [this] (string secondWord = "") {
+		return true;
+	};
+
+	funcMap[cmd::INVENTORY] = [this] (string secondWord = "") {
+		cout << "You have nothing!" << endl;
+		return false;
+	};
 }
 
 void Parser::setUpCommands() {
@@ -10,6 +49,7 @@ void Parser::setUpCommands() {
 	this->commands["look"] = cmd::LOOK;
 	this->commands["help"] = cmd::HELP;
 	this->commands["quit"] = cmd::QUIT;
+	this->commands["inventory"] = cmd::INVENTORY;
 }
 
 vector<string> Parser::getInput() {
@@ -47,43 +87,7 @@ bool Parser::processCommand() {
 		secondWord = toLowerCase(input[1]);
 
 	if(commands.find(firstWord) != commands.end()) {
-		switch(commands[firstWord]) {
-			case cmd::GO:
-				if(input.size() != 2) {
-					cout << "Go where?" << endl;
-					break;
-				}
-				if(this->player->getExitMap().find(secondWord) != this->player->getExitMap().end()) {
-					if(this->player->getExits(secondWord) != 0) {
-						Room* nextRoom = this->player->getExits(secondWord);
-						this->player->currentRoom = nextRoom;
-						this->player->roomInfo();
-					}
-				} else {
-					cout << "You can't go there." << endl;
-				}
-				break;
-
-			case cmd::LOOK:
-				player->roomInfo();
-				break;
-
-			case cmd::HELP:
-				cout << "God can't help you now!" << endl;
-				break;
-
-			case cmd::QUIT:
-				return true;
-
-			case cmd::INVENTORY:
-				this->player->inventory();
-				break;
-				
-			default:
-				cout << "What do you mean?" << endl;
-				break;
-		}
-		return false;
+		return funcMap[commands[firstWord]](secondWord);
 	}
 	cout << "What do you mean?" << endl;
 	return false;
