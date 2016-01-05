@@ -18,6 +18,8 @@ struct Player {
 
 	Room* getExits(string dir);
 
+	unordered_map<string, Room*> getExitMap();
+
 	void roomInfo();
 };
 

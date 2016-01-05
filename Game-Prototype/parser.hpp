@@ -18,7 +18,8 @@ struct Parser {
 		GO = 1,
 		LOOK,
 		HELP,
-		QUIT
+		QUIT,
+		INVENTORY
 	};
 
 	Player* player;

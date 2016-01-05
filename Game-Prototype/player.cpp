@@ -8,6 +8,10 @@ Room* Player::getExits(string dir) {
 	return this->currentRoom->exits[dir];
 }
 
+unordered_map<string, Room*> Player::getExitMap() {
+	return this->currentRoom->exits;
+}
+
 void Player::roomInfo() {
 	cout << endl << this->currentRoom->description << endl;
 	cout << "Items in room: ";
@@ -17,7 +21,8 @@ void Player::roomInfo() {
 	cout << endl;
 	cout << "Exits: ";
 	for(pair<string, Room*> p : this->currentRoom->exits) {
-		cout << p.first << " ";
+		if(p.second != 0)
+			cout << p.first << " ";
 	}
 	cout << endl;
 }

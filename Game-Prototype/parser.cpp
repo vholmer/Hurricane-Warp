@@ -46,31 +46,45 @@ bool Parser::processCommand() {
 	if(input.size() >= 2)
 		secondWord = toLowerCase(input[1]);
 
-	switch(commands[firstWord]) {
-		case cmd::GO:
-			if(input.size() != 2) {
-				cout << "Go where?" << endl;
+	if(commands.find(firstWord) != commands.end()) {
+		switch(commands[firstWord]) {
+			case cmd::GO:
+				if(input.size() != 2) {
+					cout << "Go where?" << endl;
+					break;
+				}
+				if(this->player->getExitMap().find(secondWord) != this->player->getExitMap().end()) {
+					if(this->player->getExits(secondWord) != 0) {
+						Room* nextRoom = this->player->getExits(secondWord);
+						this->player->currentRoom = nextRoom;
+						this->player->roomInfo();
+					}
+				} else {
+					cout << "You can't go there." << endl;
+				}
 				break;
-			}
-			if(player->currentRoom->exits[secondWord] != 0) {
-				Room* nextRoom = player->getExits(secondWord);
-				player->currentRoom = nextRoom;
+
+			case cmd::LOOK:
 				player->roomInfo();
-			} else {
-				cout << "You can't go there." << endl;
-			}
-			break;
-		case cmd::LOOK:
-			player->roomInfo();
-			break;
-		case cmd::HELP:
-			cout << "God can't help you now!" << endl;
-			break;
-		case cmd::QUIT:
-			return true;
-		default:
-			cout << "What do you mean?" << endl;
-			break;
+				break;
+
+			case cmd::HELP:
+				cout << "God can't help you now!" << endl;
+				break;
+
+			case cmd::QUIT:
+				return true;
+
+			case cmd::INVENTORY:
+				this->player->inventory();
+				break;
+				
+			default:
+				cout << "What do you mean?" << endl;
+				break;
+		}
+		return false;
 	}
+	cout << "What do you mean?" << endl;
 	return false;
 }
