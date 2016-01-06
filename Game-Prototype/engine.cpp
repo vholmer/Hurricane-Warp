@@ -17,6 +17,9 @@ void Engine::memHandle() {
 		for(Item* item : room->itemsInRoom) {
 			delete item;
 		}
+		for(Actor* actor : room->charsInRoom) {
+			delete actor;
+		}
 		delete room;
 	}
 	delete this->roomHandler;

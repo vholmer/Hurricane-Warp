@@ -8,7 +8,7 @@ struct Wizard : public Actor {
 
 	Wizard(int id, string name, string description);
 
-	virtual void act();
+	virtual void act() override;
 
 	void enchant(Actor* a);
 

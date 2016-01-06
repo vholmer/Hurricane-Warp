@@ -29,6 +29,8 @@ struct Actor {
 
 	void setDamageBase(int damageBase); //in actor.cpp
 
+	virtual ~Actor() = default;
+
 	virtual void act() = 0;
 
 	void walk(); //in actor.cpp
