@@ -8,6 +8,8 @@
 
 using namespace std;
 
+struct Room;
+
 struct RoomHandler {
 	vector<Room*> gameMap;
 

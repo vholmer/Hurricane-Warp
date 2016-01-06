@@ -5,8 +5,8 @@ files += player.cpp player.hpp
 files += item.cpp item.hpp
 files += roomhandler.cpp roomhandler.hpp
 files += room.cpp room.hpp
-files += actor.hpp
-files += wizard.cpp
+files += actor.cpp actor.hpp
+files += wizard.cpp wizard.hpp
 #files += troll.cpp
 #files += villager.cpp
 

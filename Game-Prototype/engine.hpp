@@ -4,6 +4,9 @@
 #include "parser.hpp"
 #include "player.hpp"
 
+struct Parser;
+struct Player;
+
 struct Engine {
 	Parser* parser;
 	Player* player;

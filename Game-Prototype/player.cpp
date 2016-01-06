@@ -1,7 +1,7 @@
 #include "player.hpp"
 
 Player::Player() {
-	this->hitPoints = 10;
+	this->health = 10;
 }
 
 Room* Player::getRoomInDir(string dir) {
@@ -20,6 +20,8 @@ void Player::roomInfo() {
 	}
 	cout << endl;
 	cout << "Exits: ";
-	cout << this->currentRoom->getExits();
+	for(string s : this->currentRoom->getExits()) {
+		cout << s << " ";
+	}
 	cout << endl;
 }

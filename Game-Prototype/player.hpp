@@ -9,10 +9,12 @@
 
 using namespace std;
 
+struct Room;
+
 struct Player {
 	Room* currentRoom;
 	vector<Item> inventory;
-	int hitPoints;
+	int health;
 
 	Player();
 

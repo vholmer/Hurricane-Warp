@@ -11,6 +11,10 @@
 
 using namespace std;
 
+struct Item;
+struct Actor;
+struct Player;
+
 const string NORTH = "north";
 const string EAST = "east";
 const string SOUTH = "south";

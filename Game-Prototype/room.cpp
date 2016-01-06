@@ -5,7 +5,7 @@ Room::Room(int id, string description) {
 	this->description = description;
 }
 
-vector<string> getExits() {
+vector<string> Room::getExits() {
 	vector<string> exits;
 	for(pair<string, Room*> p : this->exits) {
 		if(p.second != 0)

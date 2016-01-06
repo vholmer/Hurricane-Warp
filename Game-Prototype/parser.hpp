@@ -13,6 +13,8 @@
 
 using namespace std;
 
+struct Player;
+
 struct Parser {
 
 	enum class cmd : int {

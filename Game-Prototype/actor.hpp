@@ -10,6 +10,9 @@
 
 using namespace std;
 
+struct Room;
+struct Player;
+
 struct Actor {
 
 	Room* currentRoom;
@@ -19,26 +22,29 @@ struct Actor {
 	string dialogue;
 
 	int health;
+	int damageBase;
 
-	vector<Item> inventory;
+	vector<Item*> inventory;
 
-	virtual void act();
+	void setDamageBase(int damageBase); //in actor.cpp
 
-	virtual void walk();
+	virtual void act() = 0;
 
-	virtual void fight(Actor a);
+	void walk(); //in actor.cpp
 
-	virtual void fight(Player p);
+	void fight(Actor* a); //in actor.cpp
 
-	virtual void pick_up(Item a);
+	void fight(Player* p); //in actor.cpp
 
-	virtual void drop(Item a);
+	void pick_up(Item* a); //in actor.cpp
 
-	virtual void talk_to(Actor a);
+	void drop(Item* a); //in actor.cpp
 
-	virtual Player* playerInRoom();
+	void talk(); //in actor.cpp
 
-	virtual Item* itemInRoom();
+	Player* playerInRoom(); // in actor.cpp
+
+	Item* itemInRoom(); // in actor.cpp
 };
 
 #endif
