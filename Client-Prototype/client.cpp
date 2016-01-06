@@ -177,7 +177,7 @@ void Client::client_process(int socket) {
 
 	    if(n != 0) { // if no timeout
 	    	string s;
-	    	cin >> s;
+	    	getline(cin, s);
 
 	    	if(s == "Exit") {
 	    		std::cout << "We are exiting" << std::endl;
