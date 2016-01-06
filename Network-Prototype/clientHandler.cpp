@@ -153,6 +153,7 @@ bool ClientHandler::start(int sock, struct sockaddr_in &cli_addr) {
 	this->ip_adress = calculateIP(cli_addr);
 	in_thr = std::async(std::launch::async, &ClientHandler::inProcess, this, this->socket.load());
 	//out_thr = std::async(std::launch::async, &ClientHandler::outProcess, this, this->socket.load());
+	return true;
 }
 
 /*

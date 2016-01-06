@@ -85,6 +85,7 @@ int SendEnemyStruct(EnemyStruct& strc, int socket) {
 int ReadEnemyStruct(EnemyStruct& strc, int socket) {
 	int n = ReadInt(&(strc.id), socket);
 	n = ReadInt(&(strc.attackPoint), socket);
+	return n;
 }
 
 //-------------------------------------------------//
