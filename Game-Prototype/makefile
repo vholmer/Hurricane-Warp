@@ -1,4 +1,3 @@
-files = main.cpp
 files += engine.cpp
 files += parser.cpp
 files += player.cpp
@@ -7,18 +6,18 @@ files += roomhandler.cpp
 files += room.cpp
 files += actor.cpp
 files += wizard.cpp
-#files += troll.cpp troll.hpp
-#files += villager.cpp villager.hpp
+#files += troll.cpp
+#files += villager.cpp
 
 network = ../Network-Prototype/
 
-files += $(network) server.cpp
-files += $(network) clientHandler.cpp
-files += $(network) network.cpp
-files += $(network) socket.cpp
+files += $(network)server.cpp
+files += $(network)clientHandler.cpp
+files += $(network)network.cpp
+files += $(network)socket.cpp
 
 all:
-	g++ -std=c++11 $(files) -lpthread
+	g++ -std=c++11 $(files) -lpthread -o server
 
 clean:
 	rm -rf *.out.dSYM

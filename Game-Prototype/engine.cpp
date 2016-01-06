@@ -1,5 +1,6 @@
 #include <iostream>
 #include <mutex>
+#include <unordered_map>
 
 #include "engine.hpp"
 
@@ -17,9 +18,6 @@ void Engine::memHandle() {
 	for(pair<Player*, ClientHandler*> p : this->playerToClient) {
 		delete p.first;
 		delete p.second;
-	}
-	for(Player* p : this->players) {
-		delete p;
 	}
 	for(Room* room : this->roomHandler->gameMap) {
 		for(Item* item : room->itemsInRoom) {
@@ -39,10 +37,12 @@ void Engine::killConnections() {
 	}
 }
 
-void Engine::printIntro() {
-	cout << endl << "You have crashed on a mysterious planet!" << endl;
-	cout << "In the name of the Emperor, good luck." << endl;
-	cout << "What do you do?" << endl;
+string Engine::printIntro() {
+	string retString;
+	retString += "\nYou have crashed on a mysterious planet!\n";
+	retString += "In the name of the Emperor, good luck.\n";
+	retString += "What do you do?\n";
+	return retString;
 }
 
 void Engine::tickActors() {
@@ -55,11 +55,12 @@ void Engine::tickActors() {
 	globalMutex.unlock();
 }
 
-void Engine::addPlayer(ClientHandler* ch) {
+void Engine::addPlayer(ClientHandler* c) {
 	Player* p = new Player();
 	p->currentRoom = this->roomHandler->start();
-	this->clientToPlayer[p] = ch;
-	this->playerToClient[ch] = p;
+	c->sendMessage(this->printIntro());
+	this->clientToPlayer[c] = p;
+	this->playerToClient[p] = c;
 }
 
 bool Engine::parseInput(ClientHandler* ch, string str) {
@@ -70,7 +71,7 @@ bool Engine::parseInput(ClientHandler* ch, string str) {
 	return retBool;
 }
 
-void Engine::startGameLoop() {
+/*void Engine::startGameLoop() {
 	bool gameOver = false;
 
 	while(!gameOver) {
@@ -78,7 +79,7 @@ void Engine::startGameLoop() {
 			gameOver = this->parseInput(p.first, str);
 		}
 	}
-}
+}*/
 
 void Engine::respawn() {
 	cout << "No respawns lol" << endl;

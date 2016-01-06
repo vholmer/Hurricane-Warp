@@ -24,7 +24,7 @@ void Parser::setUpLambdas(Player* p) {
 		return false;
 	};
 
-	this->funcMap[cmd::LOOK] = [thisc] (string secondWord = "") {
+	this->funcMap[cmd::LOOK] = [this, p] (string secondWord = "") {
 		p->roomInfo();
 		return false;
 	};

@@ -2,7 +2,7 @@
 #define ENGINE_HPP
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #include "parser.hpp"
 #include "player.hpp"
@@ -10,12 +10,13 @@
 
 struct Parser;
 struct Player;
+struct ClientHandler;
 
 struct Engine {
 
 	Parser* parser;
-	map<Player*, ClientHandler*> playerToClient;
-	map<ClientHandler*, Player*> clientToPlayer;
+	unordered_map<Player*, ClientHandler*> playerToClient;
+	unordered_map<ClientHandler*, Player*> clientToPlayer;
 	RoomHandler* roomHandler;
 
 	Engine();
@@ -28,15 +29,15 @@ struct Engine {
 
 	void killConnections();
 
-	void printIntro();
+	string printIntro();
 
 	void tickActors();
 
-	void addPlayer(ClientHandler* ch);
+	void addPlayer(ClientHandler* c);
 
 	bool parseInput(ClientHandler* ch, string str);
 
-	void startGameLoop();
+	//void startGameLoop();
 
 	void respawn();
 };
