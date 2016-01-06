@@ -20,8 +20,10 @@ void Client::read_process(int socket) {
 		std::cout << "We are still in output" << std::endl;
 
 		if(kill_everythread.load()) {
+			std::cout << "Breaking from output" << std::endl;
    			break;
    		}
+
 		FD_ZERO(&set); /* clear the set */
 		FD_SET(socket, &set); /* add our file descriptor to the set */
 		timeout.tv_sec = 1; // set time out time  to 2 sec
@@ -139,6 +141,7 @@ void Client::quitConnection(int socket) {
 	do {
 		ReadInt(&ret, socket);
 	} while(ret != done);
+	SendInt(end, socket);
 	std::cout << "Kill the thread" << std::endl;
 
 }
