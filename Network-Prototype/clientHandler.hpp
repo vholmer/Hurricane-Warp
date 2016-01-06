@@ -29,6 +29,9 @@ using namespace Socket;
 
 using namespace Network;
 
+struct Engine;
+struct Room;
+
 class ClientHandler {
 
 	private:
