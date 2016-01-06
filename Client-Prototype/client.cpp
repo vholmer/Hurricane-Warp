@@ -17,10 +17,10 @@ void Client::read_process(int socket) {
 
 	while(1) {
 
-		std::cout << "We are still in output" << std::endl;
+		//std::cout << "We are still in output" << std::endl;
 
 		if(kill_everythread.load()) {
-			std::cout << "Breaking from output" << std::endl;
+			//std::cout << "Breaking from output" << std::endl;
    			break;
    		}
 
@@ -50,73 +50,73 @@ void Client::HandleInput(int socket) {
 
 	switch (code) {
 		case MessageCode::Default : {
-			std::cout << "Default" << std::endl;
+			//std::cout << "Default" << std::endl;
 			break;
 			}
 		case MessageCode::RoomMessage : {
-			std::cout << "Room" << std::endl;
+			//std::cout << "Room" << std::endl;
 			RoomStruct* tmp = new RoomStruct();
 			ReadRoomStruct(*tmp, socket);
-			std::cout << "id:" << tmp->id << std::endl;
+			//std::cout << "id:" << tmp->id << std::endl;
 			break;
 			}	
 		case MessageCode::AttackMessage : {
-			std::cout << "Attack" << std::endl;
+			//std::cout << "Attack" << std::endl;
 			AttackStruct* tmp = new AttackStruct();
 			//AttackStruct strc;
 			ReadAttackStruct(*tmp, socket);
-			std::cout << "attacker:" << tmp->attackerID << std::endl;
-			std::cout << "target:" << tmp->targetID << std::endl;
-			std::cout << "damage:" << tmp->damage << std::endl;
+			//std::cout << "attacker:" << tmp->attackerID << std::endl;
+			//std::cout << "target:" << tmp->targetID << std::endl;
+			//std::cout << "damage:" << tmp->damage << std::endl;
 			strc = tmp;
 			break;
 			}
 		case MessageCode::EnemyMessage : {
-			std::cout << "Enemy" << std::endl;
-			std::cout << "Enemy" << std::endl;
+			////std::cout << "Enemy" << std::endl;
+			////std::cout << "Enemy" << std::endl;
 			EnemyStruct* tmp = new EnemyStruct();
 			ReadEnemyStruct(*tmp, socket);
 			strc = tmp;
 			break;
 			}
 		case MessageCode::PlayerMessage : {
-			std::cout << "Player" << std::endl;
+			////std::cout << "Player" << std::endl;
 			PlayerStruct* tmp = new PlayerStruct();
 			ReadPlayerStruct(*tmp, socket);
-			std::cout << "id:" << tmp->id << std::endl;
-			std::cout << "name size:" << tmp->namesize << std::endl;
-			std::cout << "name:" << tmp->name << std::endl;
+			////std::cout << "id:" << tmp->id << std::endl;
+			////std::cout << "name size:" << tmp->namesize << std::endl;
+			////std::cout << "name:" << tmp->name << std::endl;
 			strc = tmp;
 			break;
 			}
 		case MessageCode::StillThere : {
-			std::cout << "Server asked if  I am still here" << std::endl;
+			////std::cout << "Server asked if  I am still here" << std::endl;
 			SendInt((int)MessageCode::StillHere, socket);
 			break;
 			}
 		case MessageCode::MessageMessage :{
-			std::cout << "Message" << std::endl;
+			////std::cout << "Message" << std::endl;
 			MessageStruct* tmp = new MessageStruct();
 			ReadMessageStruct(*tmp, socket);
-			std::cout << "Server said: " << std::endl;
-			std::cout << tmp->text << std::endl; 
+			////std::cout << "Server said: " << std::endl;
+			//std::cout << tmp->text << std::endl; 
 			strc = tmp;
 			break;
 			}
 		case MessageCode::ConnectionLost : {
-			std::cout << "Damn" << std::endl;
-			std::cout << "Server is down" << std::endl;
+			////std::cout << "Damn" << std::endl;
+			////std::cout << "Server is down" << std::endl;
 			n = SendInt((int)MessageCode::ConnectionLost, socket);
 			
 			if(n < 0) {
-				std::cout << "Something has gone completely wrong" << std::endl;
+				///std::cout << "Something has gone completely wrong" << std::endl;
 				return;
 			}
 			endConnection(socket);
 			break;
 			}
 		default : {
-			std::cout << "Random input" << std::endl;
+			////std::cout << "Random input" << std::endl;
 		}
 	}
 	delete strc;
@@ -131,18 +131,18 @@ void Client::endConnection(int socket) {
 void Client::quitConnection(int socket) {
 	this->kill_everythread = true;
 	usleep(2000000);
-	std::cout << "Send quit request to server" << std::endl;
+	////std::cout << "Send quit request to server" << std::endl;
 	int end = (int) MessageCode::ConnectionLost;
 	SendInt(end, socket);
 
-	std::cout << "Waiting for response" << std::endl;
+	////std::cout << "Waiting for response" << std::endl;
 	int done = (int) MessageCode::ConnectionLost;
 	int ret = 0;
 	do {
 		ReadInt(&ret, socket);
 	} while(ret != done);
 	SendInt(end, socket);
-	std::cout << "Kill the thread" << std::endl;
+	////std::cout << "Kill the thread" << std::endl;
 
 }
 
@@ -179,9 +179,9 @@ unsigned int Client::getNextRequestID() {
 void Client::send(int socket, string s) {
 	MessageStruct strc;
 	strc.textSize = s.size() + 1;
-	std::cout << "Gonna convert: " << s << std::endl;
+	//std::cout << "Gonna convert: " << s << std::endl;
 	SetContentCharArray(s, strc.text, strc.textSize);
-	std::cout << "Sending: " << strc.text << std::endl;
+	//std::cout << "Sending: " << strc.text << std::endl;
 	int n = SendMessageStruct(strc, socket);
 }
 
@@ -193,7 +193,7 @@ void Client::client_process(int socket) {
 	while(1) {
 
 		if(this->kill_everythread.load()) {
-			std::cout << "We are closing our connection" << std::endl;
+			//std::cout << "We are closing our connection" << std::endl;
 			close(socket);
 			break;
 		}
@@ -218,7 +218,7 @@ void Client::client_process(int socket) {
 	    		this->quitConnection(socket);
 	    	}
 	    	else {
-	    		std::cout << "Got a string" << std::endl;
+	    		//std::cout << "Got a string" << std::endl;
 	    		send(socket, s);
 	    	}
 	    }
@@ -239,7 +239,7 @@ Client::Client() : requestList(), incoming(), outgoing() {
 */
 bool Client::start(int argc, char* argv[]) {
 
-	std::cout << "starting client" << std::endl;
+	//std::cout << "starting client" << std::endl;
 	if (argc < 3) {
        fprintf(stderr,"usage %s hostname port\n", argv[0]);
        exit(0);
@@ -275,7 +275,7 @@ bool Client::start(int argc, char* argv[]) {
     auto test2 = async(std::launch::async, &Client::read_process, this, this->sockfd);
     test.wait();
     test2.wait();
-    std::cout << "We are logging out" << std::endl;
+    //std::cout << "We are logging out" << std::endl;
     return true;
 }
 
