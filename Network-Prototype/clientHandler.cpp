@@ -147,7 +147,8 @@ void ClientHandler::HandleInput(int socket) {
 		}
 	}
 	engine->parseInput(this, std::string(strc->text, strc->textSize));
-	delete strc;
+	if(strc != NULL)
+		delete strc;
 }
 
 
