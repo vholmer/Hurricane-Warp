@@ -5,14 +5,15 @@
 using namespace std;
 
 Engine::Engine() {
-	this->player = new Player();
-	this->parser = new Parser(this->player);
+	this->parser = new Parser();
 	this->roomHandler = new RoomHandler();
 }
 
 void Engine::memHandle() {
 	delete this->parser;
-	delete this->player;
+	for(Player* p : this->players) {
+		delete p;
+	}
 	for(Room* room : this->roomHandler->gameMap) {
 		for(Item* item : room->itemsInRoom) {
 			delete item;
@@ -39,17 +40,21 @@ void Engine::tickActors() {
 	}
 }
 
-void Engine::startGameLoop() {
-	//TODO: make this a lot less complicated, especially room / item descr.
+void Engine::addPlayer() {
+	Player* p = new Player();
 	printIntro();
-	this->player->currentRoom = this->roomHandler->start();
-	this->player->roomInfo();
+	p->currentRoom = this->roomHandler->start();
+	p->roomInfo();
+	this->players.push_back(p);
+}
 
+void Engine::startGameLoop() {
 	bool gameOver = false;
 
 	while(!gameOver) {
-		gameOver = parser->processCommand();
-		this->tickActors();
+		for(Player* p : this->players) {
+			gameOver = parser->processCommand(p, str);
+		}
 	}
 }
 

@@ -1,6 +1,8 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
+#include <vector>
+
 #include "parser.hpp"
 #include "player.hpp"
 
@@ -9,7 +11,7 @@ struct Player;
 
 struct Engine {
 	Parser* parser;
-	Player* player;
+	vector<Player*> players;
 	RoomHandler* roomHandler;
 
 	Engine();
@@ -23,6 +25,8 @@ struct Engine {
 	void printIntro();
 
 	void tickActors();
+
+	void addPlayer();
 
 	void startGameLoop();
 

@@ -6,7 +6,7 @@ struct Player;
 struct Wizard : public Actor {
 	int mana;
 
-	Wizard(int id, string name, string description);
+	Wizard(string name, string description);
 
 	virtual void act() override;
 

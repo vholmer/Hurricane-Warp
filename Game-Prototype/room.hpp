@@ -23,7 +23,6 @@ const string UP = "up";
 const string DOWN = "down";
 
 struct Room {
-	int roomID;
 	string description;
 	vector<Item*> itemsInRoom;
 	vector<Actor*> charsInRoom;
@@ -31,7 +30,7 @@ struct Room {
 
 	unordered_map<string, Room*> exits;
 	
-	Room(int id, string description);
+	Room(string description);
 
 	vector<string> getExits();
 

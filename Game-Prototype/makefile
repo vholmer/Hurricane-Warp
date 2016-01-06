@@ -16,6 +16,5 @@ all:
 clean:
 	rm -rf *.out.dSYM
 	rm *.hpp.gch
-	rm *.hpp.*
 	rm *.out
-
+	rm *.hpp.*

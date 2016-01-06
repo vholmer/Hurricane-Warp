@@ -1,7 +1,6 @@
 #include "room.hpp"
 
-Room::Room(int id, string description) {
-	this->roomID = id;
+Room::Room(string description) {
 	this->description = description;
 }
 

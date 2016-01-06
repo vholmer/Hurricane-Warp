@@ -1,24 +1,22 @@
 #include "parser.hpp"
 
-Parser::Parser(Player* player) {
-	this->player = player;
+Parser::Parser() {
 	setUpCommands();
-	setUpLambdas();
 }
 
-void Parser::setUpLambdas() {
-	this->funcMap[cmd::GO] = [this] (string secondWord = "") {
+void Parser::setUpLambdas(Player* p) {
+	this->funcMap[cmd::GO] = [this, p] (string secondWord = "") {
 		if(secondWord == "") {
 			cout << "Go where?" << endl;
 			return false;
 		}
-		if(this->player->getExitMap().find(secondWord) != this->player->getExitMap().end()) {
-			if(this->player->getRoomInDir(secondWord) != 0) {
-				Room* nextRoom = this->player->getRoomInDir(secondWord);
-				Room* prevRoom = this->player->currentRoom;
-				nextRoom->addPlayer(this->player);
-				prevRoom->removePlayer(this->player);
-				this->player->roomInfo();
+		if(p->getExitMap().find(secondWord) != p->getExitMap().end()) {
+			if(p->getRoomInDir(secondWord) != 0) {
+				Room* nextRoom = p->getRoomInDir(secondWord);
+				Room* prevRoom = p->currentRoom;
+				nextRoom->addPlayer(p);
+				prevRoom->removePlayer(p);
+				p->roomInfo();
 			}
 		} else {
 			cout << "You can't go there." << endl;
@@ -26,8 +24,8 @@ void Parser::setUpLambdas() {
 		return false;
 	};
 
-	this->funcMap[cmd::LOOK] = [this] (string secondWord = "") {
-		this->player->roomInfo();
+	this->funcMap[cmd::LOOK] = [thisc] (string secondWord = "") {
+		p->roomInfo();
 		return false;
 	};
 
@@ -54,10 +52,8 @@ void Parser::setUpCommands() {
 	this->commands["inventory"] = cmd::INVENTORY;
 }
 
-vector<string> Parser::getInput() {
-	string input;
-	getline(cin, input);
-	std::stringstream s(input);
+vector<string> Parser::getInput(string str) {
+	std::stringstream s(str);
 
 	vector<string> inpVec;
 
@@ -79,9 +75,10 @@ string Parser::toLowerCase(string str) {
 	return result;
 }
 
-bool Parser::processCommand() {
+bool Parser::processCommand(Player* p, string str) {
+	this->setUpLambdas(p);
 	cout << "> ";
-	vector<string> input = getInput();
+	vector<string> input = getInput(str);
 
 	string firstWord = toLowerCase(input[0]);
 	string secondWord;

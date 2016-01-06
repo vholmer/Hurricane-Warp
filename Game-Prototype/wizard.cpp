@@ -1,7 +1,6 @@
 #include "wizard.hpp"
 
-Wizard::Wizard(int id, string name, string description) {
-	this->actorID = id;
+Wizard::Wizard(string name, string description) {
 	this->name = name;
 	this->description = description;
 

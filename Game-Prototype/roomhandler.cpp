@@ -10,21 +10,17 @@ struct Wizard;
 RoomHandler::RoomHandler() {
 	// ----- ROOM INITIATIONS BEGIN -----
 
-	Room* startRoom = new Room(1,
-		string(
+	Room* startRoom = new Room(string(
 		"You are in a dark forest."
 		));
-	Item* knife = new Item(1,
-		string("A very sharp knife."),
+	Item* knife = new Item(string("A very sharp knife."),
 		string("Knife")
 		);
 
-	Room* clearing = new Room(2,
-		string(
+	Room* clearing = new Room(string(
 		"You are in a small clearing. There is a red house here."
 		));
-	Item* milk = new Item(2,
-		string("A sealed jar of milk."),
+	Item* milk = new Item(string("A sealed jar of milk."),
 		string("Milk")
 		);
 
@@ -41,8 +37,7 @@ RoomHandler::RoomHandler() {
 
 	// ----- ACTOR INITIATIONS BEGIN -----
 
-	Wizard* wizard = new Wizard(1,
-		string("Snilsson"),
+	Wizard* wizard = new Wizard(string("Snilsson"),
 		string("An evil wizard, breaking for-loops since 1984.")
 		);
 

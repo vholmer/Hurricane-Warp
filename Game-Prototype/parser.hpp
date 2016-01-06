@@ -32,17 +32,17 @@ struct Parser {
 
 	unordered_map<string, cmd> commands;
 
-	Parser(Player* player);
+	Parser();
 
-	void setUpLambdas();
+	void setUpLambdas(Player* p);
 
 	void setUpCommands();
 
-	vector<string> getInput();
+	vector<string> getInput(string str);
 
 	string toLowerCase(string str);
 
-	bool processCommand();
+	bool processCommand(Player* p, string str);
 };
 
 #endif
