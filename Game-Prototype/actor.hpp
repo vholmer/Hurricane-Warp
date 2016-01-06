@@ -35,6 +35,8 @@ struct Actor {
 
 	void walk(); //in actor.cpp
 
+	void printActor();
+
 	void fight(Actor* a); //in actor.cpp
 
 	void fight(Player* p); //in actor.cpp

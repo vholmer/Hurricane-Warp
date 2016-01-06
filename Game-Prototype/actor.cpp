@@ -11,11 +11,21 @@ void Actor::walk() {
 
 	string chosenDir = possibleDirs[diceRoll];
 
-	this->currentRoom->removeChar(this);
-
 	Room* nextRoom = this->currentRoom->exits[chosenDir];
 
-	this->currentRoom = nextRoom;
+	Room* prevRoom = this->currentRoom;
+
+	nextRoom->addChar(this);
+
+	prevRoom->removeChar(this);
+
+	if(this->playerInRoom() != 0) {
+		this->printActor();
+	}
+}
+
+void Actor::printActor() {
+	cout << this->name << " is here. " << this->description << endl;
 }
 
 void Actor::fight(Actor* a) {

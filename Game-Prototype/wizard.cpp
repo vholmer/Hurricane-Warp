@@ -21,18 +21,18 @@ void Wizard::act() {
 		return;
 	}
 	if(this->health < 3) {
-		walk();
+		this->walk();
 		return;
 	}
-	if(this->mana >= 5 && playerInRoom() != 0) {
-		enchant(playerInRoom());
+	if(this->mana >= 5 && this->playerInRoom() != 0) {
+		this->enchant(this->playerInRoom());
 		this->mana -= 3;
 		return;
-	} else if(playerInRoom() != 0) {
-		fight(playerInRoom());
+	} else if(this->playerInRoom() != 0) {
+		this->fight(this->playerInRoom());
 		return;
 	}
-	walk();
+	this->walk();
 }
 
 void Wizard::enchant(Actor* a) {

@@ -23,6 +23,11 @@ void Room::addChar(Actor* actor) {
 	actor->currentRoom = this;
 }
 
+void Room::addPlayer(Player* p) {
+	this->playersInRoom.push_back(p);
+	p->currentRoom = this;
+}
+
 void Room::removeItem(Item* item) {
 	for(auto i = this->itemsInRoom.begin(); i != this->itemsInRoom.end(); ++i) {
 		if(*i == item) {
@@ -38,6 +43,16 @@ void Room::removeChar(Actor* actor) {
 		if(*i == actor) {
 			this->charsInRoom.erase(i);
 			this->charsInRoom.shrink_to_fit();
+			return;
+		}
+	}
+}
+
+void Room::removePlayer(Player* p) {
+	for(auto i = this->playersInRoom.begin(); i != this->playersInRoom.end(); ++i) {
+		if(*i == p) {
+			this->playersInRoom.erase(i);
+			this->playersInRoom.shrink_to_fit();
 			return;
 		}
 	}

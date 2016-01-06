@@ -22,6 +22,8 @@ struct Engine {
 
 	void printIntro();
 
+	void tickActors();
+
 	void startGameLoop();
 
 	void respawn();

@@ -15,7 +15,9 @@ void Parser::setUpLambdas() {
 		if(this->player->getExitMap().find(secondWord) != this->player->getExitMap().end()) {
 			if(this->player->getRoomInDir(secondWord) != 0) {
 				Room* nextRoom = this->player->getRoomInDir(secondWord);
-				this->player->currentRoom = nextRoom;
+				Room* prevRoom = this->player->currentRoom;
+				nextRoom->addPlayer(this->player);
+				prevRoom->removePlayer(this->player);
 				this->player->roomInfo();
 			}
 		} else {

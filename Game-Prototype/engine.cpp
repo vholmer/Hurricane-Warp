@@ -31,6 +31,14 @@ void Engine::printIntro() {
 	cout << "What do you do?" << endl;
 }
 
+void Engine::tickActors() {
+	for(Room* room : this->roomHandler->gameMap) {
+		for(Actor* actor : room->charsInRoom) {
+			actor->act();
+		}
+	}
+}
+
 void Engine::startGameLoop() {
 	//TODO: make this a lot less complicated, especially room / item descr.
 	printIntro();
@@ -41,6 +49,7 @@ void Engine::startGameLoop() {
 
 	while(!gameOver) {
 		gameOver = parser->processCommand();
+		this->tickActors();
 	}
 }
 

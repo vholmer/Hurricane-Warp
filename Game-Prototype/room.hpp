@@ -39,9 +39,13 @@ struct Room {
 
 	void addChar(Actor* actor);
 
+	void addPlayer(Player* p);
+
 	void removeItem(Item* item);
 
 	void removeChar(Actor* actor);
+
+	void removePlayer(Player* p);
 };
 
 #endif
