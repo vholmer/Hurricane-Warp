@@ -108,7 +108,7 @@ void ClientHandler::HandleInput(int socket) {
 	if(n < 0) return;
 	MessageCode code = (MessageCode) read;
 	std::cout << "We got: " << read << std::endl;
-	NetworkStruct* strc = NULL;
+	MessageStruct* strc = NULL;
 	switch (code) {
 		case MessageCode::MessageMessage : {
 			std::cout << "Message" << std::endl;
