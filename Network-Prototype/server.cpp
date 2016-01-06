@@ -66,7 +66,7 @@ bool Server::start(char* c) {
 	this->serv_addr.sin_addr.s_addr = INADDR_ANY;
 	this->serv_addr.sin_port = htons(this->portn);
 
-	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < (long)0) {
     	server_error("ERROR on binding");
     } 
     //Start a thread which listens to the clients
