@@ -53,42 +53,6 @@ void Client::HandleInput(int socket) {
 			//std::cout << "Default" << std::endl;
 			break;
 			}
-		case MessageCode::RoomMessage : {
-			//std::cout << "Room" << std::endl;
-			RoomStruct* tmp = new RoomStruct();
-			ReadRoomStruct(*tmp, socket);
-			//std::cout << "id:" << tmp->id << std::endl;
-			break;
-			}	
-		case MessageCode::AttackMessage : {
-			//std::cout << "Attack" << std::endl;
-			AttackStruct* tmp = new AttackStruct();
-			//AttackStruct strc;
-			ReadAttackStruct(*tmp, socket);
-			//std::cout << "attacker:" << tmp->attackerID << std::endl;
-			//std::cout << "target:" << tmp->targetID << std::endl;
-			//std::cout << "damage:" << tmp->damage << std::endl;
-			strc = tmp;
-			break;
-			}
-		case MessageCode::EnemyMessage : {
-			////std::cout << "Enemy" << std::endl;
-			////std::cout << "Enemy" << std::endl;
-			EnemyStruct* tmp = new EnemyStruct();
-			ReadEnemyStruct(*tmp, socket);
-			strc = tmp;
-			break;
-			}
-		case MessageCode::PlayerMessage : {
-			////std::cout << "Player" << std::endl;
-			PlayerStruct* tmp = new PlayerStruct();
-			ReadPlayerStruct(*tmp, socket);
-			////std::cout << "id:" << tmp->id << std::endl;
-			////std::cout << "name size:" << tmp->namesize << std::endl;
-			////std::cout << "name:" << tmp->name << std::endl;
-			strc = tmp;
-			break;
-			}
 		case MessageCode::StillThere : {
 			////std::cout << "Server asked if  I am still here" << std::endl;
 			SendInt((int)MessageCode::StillHere, socket);
