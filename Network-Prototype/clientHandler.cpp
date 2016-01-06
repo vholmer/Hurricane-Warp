@@ -121,15 +121,11 @@ void ClientHandler::HandleInput(int socket) {
 			break;
 		}
 		case MessageCode::ConnectionLost : {
-			std::cout << "Damn" << std::endl;
-			std::cout << "Server is down" << std::endl;
-			n = SendInt((int)MessageCode::ConnectionLost, socket);
-			
-			if(n < 0) {
-				std::cout << "Something has gone completely wrong" << std::endl;
-				return;
-			}
-			endConnection();
+			std::cout << "End connection" << std::endl;
+			std::cout << "We are done here" << std::endl;
+			int i = (int) MessageCode::ConnectionLost;
+			SendInt(i, socket);
+			this->quitConnection();
 			break;
 			}
 		case MessageCode::MessageMessage : {

@@ -24,7 +24,7 @@ void Client::read_process(int socket) {
    		}
 		FD_ZERO(&set); /* clear the set */
 		FD_SET(socket, &set); /* add our file descriptor to the set */
-		timeout.tv_sec = 2; // set time out time  to 2 sec
+		timeout.tv_sec = 1; // set time out time  to 2 sec
 		timeout.tv_usec = 0; // set return signal
    		
    		int ret = select(socket + 1, &set, NULL, NULL, &timeout);
@@ -127,6 +127,8 @@ void Client::endConnection(int socket) {
 }
 
 void Client::quitConnection(int socket) {
+	this->kill_everythread = true;
+	usleep(2000000);
 	std::cout << "Send quit request to server" << std::endl;
 	int end = (int) MessageCode::ConnectionLost;
 	SendInt(end, socket);
@@ -137,10 +139,8 @@ void Client::quitConnection(int socket) {
 	do {
 		ReadInt(&ret, socket);
 	} while(ret != done);
-	SendInt(end, socket);
 	std::cout << "Kill the thread" << std::endl;
-	
-	this->kill_everythread = true;
+
 }
 
 
