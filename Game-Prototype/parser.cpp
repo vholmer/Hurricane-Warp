@@ -7,7 +7,7 @@ Parser::Parser(Player* player) {
 }
 
 void Parser::setUpLambdas() {
-	funcMap[cmd::GO] = [this] (string secondWord = "") {
+	this->funcMap[cmd::GO] = [this] (string secondWord = "") {
 		if(secondWord == "") {
 			cout << "Go where?" << endl;
 			return false;
@@ -24,21 +24,21 @@ void Parser::setUpLambdas() {
 		return false;
 	};
 
-	funcMap[cmd::LOOK] = [this] (string secondWord = "") {
+	this->funcMap[cmd::LOOK] = [this] (string secondWord = "") {
 		this->player->roomInfo();
 		return false;
 	};
 
-	funcMap[cmd::HELP] = [this] (string secondWord = "") {
+	this->funcMap[cmd::HELP] = [this] (string secondWord = "") {
 		cout << "God can't help you now!" << endl;
 		return false;
 	};
 
-	funcMap[cmd::QUIT] = [this] (string secondWord = "") {
+	this->funcMap[cmd::QUIT] = [this] (string secondWord = "") {
 		return true;
 	};
 
-	funcMap[cmd::INVENTORY] = [this] (string secondWord = "") {
+	this->funcMap[cmd::INVENTORY] = [this] (string secondWord = "") {
 		cout << "You have nothing!" << endl;
 		return false;
 	};
@@ -88,7 +88,7 @@ bool Parser::processCommand() {
 
 	if(commands.find(firstWord) != commands.end()) {
 		cmd token = commands[firstWord];
-		return funcMap[token](secondWord);
+		return this->funcMap[token](secondWord);
 	}
 	cout << "What do you mean?" << endl;
 	return false;
