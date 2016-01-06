@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <map>
 #include <locale>
+#include <functional>
 
 #include "player.hpp"
 
