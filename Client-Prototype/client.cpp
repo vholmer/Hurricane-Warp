@@ -46,7 +46,7 @@ void Client::HandleInput(int socket) {
 	n = ReadInt(&read, socket);
 	if(n < 0) return;
 	MessageCode code = (MessageCode) read;
-	NetworkStruct* strc = NULL;
+	MessageStruct* strc = NULL;
 
 	switch (code) {
 		case MessageCode::Default : {
