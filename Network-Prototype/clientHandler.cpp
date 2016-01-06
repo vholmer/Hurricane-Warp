@@ -115,6 +115,11 @@ void ClientHandler::HandleInput(int socket) {
 			SendInt((int)MessageCode::StillHere, socket);
 			break;
 			}
+		case MessageCode::StillHere : {
+			std::cout << "client is still there" << std::endl;
+			clientDead = false;
+			break;
+		}
 		case MessageCode::ConnectionLost : {
 			std::cout << "Damn" << std::endl;
 			std::cout << "Server is down" << std::endl;
