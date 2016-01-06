@@ -54,6 +54,7 @@ Server::Server() : client_list() , kill_everythread(false){
 }
 
 Server::~Server() {
+	std::cout << "Delete server" << std::endl;
 	delete this->engine;
 }
 
@@ -87,7 +88,7 @@ bool Server::stop() {
 	//this->list_mutex.lock(); // lock the list
 	std::cout << "locking list" << std::endl;
 	engine->killConnections();
-	engine->memHandle();
+	//engine->memHandle();
 	/*for(ClientHandler* c: client_list) {
 		std::cout << "Deletes clients" << std::endl;
 		(*c).quitConnection(); // Kill all clients
