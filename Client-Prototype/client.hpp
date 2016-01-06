@@ -31,8 +31,8 @@ using namespace Socket;
 
 using namespace Network;
 
-volatile atomic<std::queue<std::string>> input_queue(std::queue<std::string>());
-volatile atomic<std::queue<std::string>> output_queue(std::queue<std::string>());
+//volatile atomic<std::queue<std::string>> input_queue(std::queue<std::string>());
+//volatile atomic<std::queue<std::string>> output_queue(std::queue<std::string>());
 
 int sock;
 
@@ -64,8 +64,8 @@ class Client {
 		future<void> output_thread;
 
 		vector<int> requestList;
-		queue<NetworkStruct> incoming;
-		queue<NetworkStruct> outgoing;
+		queue<NetworkStruct*> incoming;
+		queue<NetworkStruct*> outgoing;
 
 		void read_process(int socket);
 		void sendProcess(int socket);
@@ -90,18 +90,22 @@ class Client {
 
 		void quitConnection(int socket);
 
-		/*
-			Start client
-		*/
+		
+		//Start client
 		bool start(int argc, char* argv[]);
 
-		/*
-			End client
-		*/
+		//End client
 		bool end();
 
+		// Room requestRoom(int roomID);
 
-		Room requestRoom(int roomID);
+		NetworkStruct* getNextServerMessage();
+
+		void sendMessage(std::string str);
+
+		//void sendAttack();
+
+		//void sendAction();
 
 };
 #endif

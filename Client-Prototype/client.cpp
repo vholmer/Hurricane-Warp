@@ -44,6 +44,7 @@ void Client::HandleInput(int socket) {
 	n = ReadInt(&read, socket);
 	if(n < 0) return;
 	MessageCode code = (MessageCode) read;
+	NetworkStruct* strc = NULL;
 
 	switch (code) {
 		case MessageCode::Default : {
@@ -52,31 +53,38 @@ void Client::HandleInput(int socket) {
 			}
 		case MessageCode::RoomMessage : {
 			std::cout << "Room" << std::endl;
-			RoomStruct strc;
-			ReadRoomStruct(strc, socket);
-			std::cout << "id:" << strc.id << std::endl;
+			RoomStruct* tmp = new RoomStruct();
+			ReadRoomStruct(*tmp, socket);
+			std::cout << "id:" << tmp->id << std::endl;
 			break;
 			}	
 		case MessageCode::AttackMessage : {
 			std::cout << "Attack" << std::endl;
-			AttackStruct strc;
-			ReadAttackStruct(strc, socket);
-			std::cout << "attacker:" << strc.attackerID << std::endl;
-			std::cout << "target:" << strc.targetID << std::endl;
-			std::cout << "damage:" << strc.damage << std::endl;
+			AttackStruct* tmp = new AttackStruct();
+			//AttackStruct strc;
+			ReadAttackStruct(*tmp, socket);
+			std::cout << "attacker:" << tmp->attackerID << std::endl;
+			std::cout << "target:" << tmp->targetID << std::endl;
+			std::cout << "damage:" << tmp->damage << std::endl;
+			strc = tmp;
 			break;
 			}
 		case MessageCode::EnemyMessage : {
 			std::cout << "Enemy" << std::endl;
+			std::cout << "Enemy" << std::endl;
+			EnemyStruct* tmp = new EnemyStruct();
+			ReadEnemyStruct(*tmp, socket);
+			strc = tmp;
 			break;
 			}
 		case MessageCode::PlayerMessage : {
 			std::cout << "Player" << std::endl;
-			PlayerStruct strc;
-			ReadPlayerStruct(strc, socket);
-			std::cout << "id:" << strc.id << std::endl;
-			std::cout << "name size:" << strc.namesize << std::endl;
-			std::cout << "name:" << strc.name << std::endl;
+			PlayerStruct* tmp = new PlayerStruct();
+			ReadPlayerStruct(*tmp, socket);
+			std::cout << "id:" << tmp->id << std::endl;
+			std::cout << "name size:" << tmp->namesize << std::endl;
+			std::cout << "name:" << tmp->name << std::endl;
+			strc = tmp;
 			break;
 			}
 		case MessageCode::StillThere : {
@@ -86,10 +94,11 @@ void Client::HandleInput(int socket) {
 			}
 		case MessageCode::MessageMessage :{
 			std::cout << "Message" << std::endl;
-			MessageStruct strc;
-			ReadMessageStruct(strc, socket);
+			MessageStruct* tmp = new MessageStruct();
+			ReadMessageStruct(*tmp, socket);
 			std::cout << "Server said: " << std::endl;
-			std::cout << strc.text << std::endl; 
+			std::cout << tmp->text << std::endl; 
+			strc = tmp;
 			break;
 			}
 		case MessageCode::ConnectionLost : {
@@ -108,10 +117,8 @@ void Client::HandleInput(int socket) {
 			std::cout << "Random input" << std::endl;
 		}
 	}
+	delete strc;
 }
-
-
-
 
 
 void Client::endConnection(int socket) {
@@ -167,15 +174,12 @@ unsigned int Client::getNextRequestID() {
 	Send a string on a socket
 */
 void Client::send(int socket, string s) {
-	std::copy(s.begin(), s.end(), buffer);
-	buffer[s.size()]=0;
-	std::cout << buffer << std::endl;
-	PlayerStruct strc;
-	strc.id = 1337;
-	int i = SetContentCharArray(s, strc.name, strc.namesize);
-	//TODO(Lukas) note: Handle buffer size missmatch
-	int n = SendPlayerStruct(strc, socket); 
-	//TODO(Lukas) note: Handle error messages, in cases of failed send
+	MessageStruct strc;
+	strc.textSize = s.size() + 1;
+	std::cout << "Gonna convert: " << s << std::endl;
+	SetContentCharArray(s, strc.text, strc.textSize);
+	std::cout << "Sending: " << strc.text << std::endl;
+	int n = SendMessageStruct(strc, socket);
 }
 
 

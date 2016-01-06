@@ -1,8 +1,5 @@
 #include "clientHandler.hpp"
 
-using namespace Socket;
-
-using namespace Network;
 
 //Error handling
 void client_error(const char *msg)
@@ -23,19 +20,31 @@ string ClientHandler::calculateIP(struct sockaddr_in &cli_addr) const {
 	The process that handles all output from the clienthandler
 */
 void ClientHandler::outProcess(int socket) {
+	int count = 0;
 	while(1) {
 		int n = 0;
 		if(kill_everythread.load()) {
 			close(socket);
 			return;
 		} else {
-			char buffer [1024];
-			std::string s = "日本国（にっぽんこく、にほんこく）、または日本（にっぽん、にほん）は、東アジアに位置する日本列島（北海道・本州・四国・九州の主要四島およびそれに付随する島々）及び、南西諸島・小笠原諸島などの諸島嶼から成る島国である[1]。日本語が事実上の公用語として使用されている。首都は事実上東京都とされている。";
-			PlayerStruct strc;
-			SetContentCharArray(s, strc.name, strc.namesize);
-			strc.id = 1337;
-			strc.namesize = s.size() + 1;
-			int n = SendPlayerStruct(strc, socket);
+			if(count % 2 == 0) 	 {		
+				std::string s = "FUCK";
+				MessageStruct strc;
+				strc.textSize = s.size() + 1;
+				std::cout << "Gonna convert: " << s << std::endl;
+				SetContentCharArray(s, strc.text, strc.textSize);
+				std::cout << "Sending: " << strc.text << std::endl;
+				int n = SendMessageStruct(strc, socket);
+			} 
+			else {
+				std::string s = "Damn";
+				MessageStruct strc;
+				strc.textSize = s.size() + 1;
+				std::cout << "Gonna convert: " << s << std::endl;
+				SetContentCharArray(s, strc.text, strc.textSize);
+				std::cout << "Sending: " << strc.text << std::endl;
+				int n = SendMessageStruct(strc, socket);
+			}
 		}
 
 		if (n < 0) {
@@ -43,7 +52,7 @@ void ClientHandler::outProcess(int socket) {
 			close(socket);
 			return;
 		}
-
+		++count;
 		usleep(500000);
 	}
 }
@@ -73,7 +82,6 @@ void ClientHandler::inProcess(int socket) {
    		if(ret != 0) {
    			clientDead = false;
    			std::cout << "Gonna read" << std::endl;
-   			std::cout << "Fuck" << std::endl;
    			HandleInput(socket);
    			std::cout << "Done reading" << std::endl;
    		} 
@@ -89,6 +97,7 @@ void ClientHandler::inProcess(int socket) {
 	}
 }
 
+
 void ClientHandler::HandleInput(int socket) {
 	std::cout << "In handle input" << std::endl;
 	int n;
@@ -98,9 +107,8 @@ void ClientHandler::HandleInput(int socket) {
 	std::cout << "Trying to read" << std::endl;
 	if(n < 0) return;
 	MessageCode code = (MessageCode) read;
-
 	std::cout << "We got: " << read << std::endl;
-
+	NetworkStruct* strc = NULL;
 	switch (code) {
 		case MessageCode::Default : {
 			std::cout << "Default" << std::endl;
@@ -108,40 +116,45 @@ void ClientHandler::HandleInput(int socket) {
 			}
 		case MessageCode::RoomMessage : {
 			std::cout << "Room" << std::endl;
-			RoomStruct strc;
-			ReadRoomStruct(strc, socket);
-			std::cout << "id:" << strc.id << std::endl;
+			RoomStruct* tmp = new RoomStruct();
+			ReadRoomStruct(*tmp, socket);
+			std::cout << "id:" << tmp->id << std::endl;
+			strc = tmp;
 			break;
 			}	
 		case MessageCode::AttackMessage : {
 			std::cout << "Attack" << std::endl;
-			AttackStruct strc;
-			ReadAttackStruct(strc, socket);
-			std::cout << "attacker:" << strc.attackerID << std::endl;
-			std::cout << "target:" << strc.targetID << std::endl;
-			std::cout << "damage:" << strc.damage << std::endl;
+			AttackStruct* tmp = new AttackStruct();
+			ReadAttackStruct(*tmp, socket);
+			std::cout << "attacker:" << tmp->attackerID << std::endl;
+			std::cout << "target:" << tmp->targetID << std::endl;
+			std::cout << "damage:" << tmp->damage << std::endl;
+			strc = tmp;
 			break;
 			}
 		case MessageCode::EnemyMessage : {
 			std::cout << "Enemy" << std::endl;
+
 			break;
 			}
 		case MessageCode::PlayerMessage : {
 			std::cout << "Player" << std::endl;
-			PlayerStruct strc;
-			ReadPlayerStruct(strc, socket);
-			std::cout << "id:" << strc.id << std::endl;
-			std::cout << "name size:" << strc.namesize << std::endl;
-			std::cout << "name:" << strc.name << std::endl;		
+			PlayerStruct* tmp = new PlayerStruct();
+			ReadPlayerStruct(*tmp, socket);
+			std::cout << "id:" << tmp->id << std::endl;
+			std::cout << "name size:" << tmp->namesize << std::endl;
+			std::cout << "name:" << tmp->name << std::endl;
+			strc = tmp;		
 			break;
 			}
 		case MessageCode::MessageMessage : {
 			std::cout << "Message" << std::endl;
-			MessageStruct strc;
-			ReadMessageStruct(strc, socket);
+			MessageStruct* tmp = new MessageStruct();
+			ReadMessageStruct(*tmp, socket);
 			std::cout << "Server said: " << std::endl;
-			std::cout << strc.textSize << std::endl;
-			std::cout << strc.text << std::endl;  
+			std::cout << tmp->textSize << std::endl;
+			std::cout << tmp->text << std::endl; 
+			strc = tmp; 
 			break;
 			}
 		case MessageCode::StillHere : {
@@ -160,15 +173,14 @@ void ClientHandler::HandleInput(int socket) {
 			std::cout << "Random input" << std::endl;
 		}
 	}
+	delete strc;
 }
 
 
 /*
  
 */
-ClientHandler::ClientHandler() {
-	//maybe this should do something
-}
+ClientHandler::ClientHandler() {}
 
 /*
 
@@ -186,7 +198,7 @@ bool ClientHandler::start(int sock, struct sockaddr_in &cli_addr) {
 	this->id = std::to_string(sock);
 	this->ip_adress = calculateIP(cli_addr);
 	in_thr = std::async(std::launch::async, &ClientHandler::inProcess, this, this->socket.load());
-	out_thr = std::async(std::launch::async, &ClientHandler::outProcess, this, this->socket.load());
+	//out_thr = std::async(std::launch::async, &ClientHandler::outProcess, this, this->socket.load());
 }
 
 /*
@@ -202,7 +214,7 @@ bool ClientHandler::endConnection() {
 bool ClientHandler::quitConnection() {
 		std::cout << "End connection" << std::endl;
 		if(kill_everythread.load()) {
-			out_thr.wait();
+			//out_thr.wait();
 			in_thr.wait();
 			return true;
 		}
@@ -222,10 +234,10 @@ bool ClientHandler::quitConnection() {
 	Returns true if the connection can be ended without errors
 */
 bool ClientHandler::canBeEnded() const {
-	auto status1 = out_thr.wait_for(std::chrono::milliseconds(0));
+	//auto status1 = out_thr.wait_for(std::chrono::milliseconds(0));
 	auto status2 = in_thr.wait_for(std::chrono::milliseconds(0));
-	return status1 == future_status::ready &&
-	status2 == future_status::ready;
+	//return //status1 == future_status::ready &&
+	return status2 == future_status::ready;
 
 }
 
@@ -242,3 +254,25 @@ string ClientHandler::getIP() const {
 string ClientHandler::getID() const {
 	return this->id;
 }
+
+/*
+void ClientHandler::sendSpawn() {
+
+
+} */
+
+void ClientHandler::sendMessage(std::string s) {
+	MessageStruct strc;
+	strc.textSize = s.size() + 1;
+	std::cout << "Gonna convert: " << s << std::endl;
+	SetContentCharArray(s, strc.text, strc.textSize);
+	std::cout << "Sending: " << strc.text << std::endl;
+	int n = SendMessageStruct(strc, socket.load());
+
+}
+
+/*
+void ClientHandler::sendRoomInfo(Room* room) {
+
+}
+*/

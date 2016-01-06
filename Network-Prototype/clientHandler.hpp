@@ -8,7 +8,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
 #include "network.hpp"
+#include "../Game-Prototype/room.hpp"
 
 #include <chrono>
 #include <future>   
@@ -24,6 +26,8 @@ using namespace std;
 
 using namespace Socket;
 
+using namespace Network;
+
 class ClientHandler {
 
 	private:
@@ -31,6 +35,11 @@ class ClientHandler {
 		string ip_adress;
 
 		atomic<int> socket;
+		//atomic<queue<NetworkStruct*>> input;
+		//atomic<queue<NetworkStruct*>> output;
+
+		queue<std::string> input;
+
 
 		future<void> out_thr; // Future objects which referenses the output thread
 		future<void> in_thr; // Future objects which referenses the input thread
@@ -52,8 +61,8 @@ class ClientHandler {
 
 	public:
 
-		queue<string> input; // queue which holds all the input 
-		queue<string> output; // queue which holds all the ouput
+		//queue<string> input; // queue which holds all the input 
+		//queue<string> output; // queue which holds all the ouput
 
 		/*
 		Create a client which listens to the socket
@@ -96,5 +105,13 @@ class ClientHandler {
 		Returns the id of the client
 		*/
 		string getID() const;
+
+		//void sendSpawn();
+
+		void sendMessage(std::string str);
+
+		//void sendRoomInfo(Room* room);
+
+		//NetworkStruct* getNextClientMessage();
 };
 #endif

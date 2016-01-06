@@ -5,9 +5,32 @@
 
 namespace Network {
 
+RoomStruct::RoomStruct() {
+	code = MessageCode::RoomMessage;
+}
+
+RoomStruct::~RoomStruct() {
+	/*
+	for(PlayerStruct* strc: players) {
+		delete strc;
+	}
+	for(EnemyStruct* enem: enemies) {
+		delete enem;
+	}
+	*/
+}
+
 int SendRoomStruct(RoomStruct& strc, int socket) {
 	int n = SendInt((int)strc.code, socket);
 	n = SendInt(strc.id, socket);
+	/*n = SendInt(strc.players.size());
+	for(PlayerStruct* strc: players) {
+		SendPlayerStruct(*strc, socket);
+	}
+	for(EnemyStruct* enem: enemies) {
+		SendPlayerStruct(*enem, socket);
+	}
+	*/
 	return n;
 }
 
@@ -20,6 +43,11 @@ int ReadRoomStruct(RoomStruct& strc, int socket) {
 //Message
 //-------------------------------------------------//
 
+AttackStruct::AttackStruct() {
+	code = MessageCode::AttackMessage;
+}
+
+AttackStruct::~AttackStruct() {}
 
 int ReadAttackStruct(AttackStruct& strc, int socket) {
 	int n = ReadInt(&(strc.attackerID), socket);
@@ -40,6 +68,12 @@ int SendAttackStruct(AttackStruct& strc, int socket) {
 //-------------------------------------------------//
 //Message
 //-------------------------------------------------//
+
+EnemyStruct::EnemyStruct() {
+	code = MessageCode::EnemyMessage;
+}
+
+EnemyStruct::~EnemyStruct() {}
 
 int SendEnemyStruct(EnemyStruct& strc, int socket) {
 	int n = SendInt((unsigned int)strc.code, socket);
@@ -74,7 +108,7 @@ int ReadSpawnStruct(SpawnStruct& strc, int socket) {
 //Message
 //-------------------------------------------------//
 
-PlayerStruct::PlayerStruct() {
+PlayerStruct::PlayerStruct(int size) {
 	code = MessageCode::PlayerMessage;
 	nameBufferSize = size;
 	name = new char[nameBufferSize]();
@@ -98,11 +132,10 @@ int ReadPlayerStruct(PlayerStruct& strc, int socket) {
 	return n;
 }
 
-
 //-------------------------------------------------//
 //Message
 //-------------------------------------------------//
-MessageStruct::MessageStruct(int size = 1024) {
+MessageStruct::MessageStruct(int size) {
 		code = MessageCode::MessageMessage;
 		requestID = 0;
 		textBufferSize = size;
@@ -114,21 +147,22 @@ MessageStruct::~MessageStruct() {
 }
 
 int ReadMessageStruct(MessageStruct& strc, int socket) {
-	int n = ReadInt(&(strc.senderID), socket);
-	n = ReadInt(&(strc.receiverID), socket);
-	n = ReadInt(&(strc.textSize), socket);
+	int n = ReadInt(&(strc.textSize), socket);
 	n = ReadString(strc.text, strc.textSize, socket);
 	return n;
 }
 
 int SendMessageStruct(MessageStruct& strc, int socket) {
-	int n = SendInt((int) strc.code, socket);
-	
-	n = SendInt(strc.senderID, socket);
-	n = SendInt(strc.receiverID, socket);
+	int n = SendInt((int) strc.code, socket);	
 	n = SendString(strc.text, strc.textSize, socket);
 	return n;
 }
+
+ItemStruct::ItemStruct () {
+	code = MessageCode::ItemMessage;
+}
+
+ItemStruct::~ItemStruct() {}
 
 //---//
 int SetContentCharArray(std::string source, char * copytarget, int targetSize) {

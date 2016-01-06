@@ -2,6 +2,7 @@
 #define NETWORK_H
 
 #include "socket.hpp"
+#include <vector>
 
 using namespace Socket;
 
@@ -18,6 +19,7 @@ enum class MessageCode : unsigned int {
 	MessageMessage,
 	SpawnMessage,
 	DropMessage,
+	ItemMessage,
 	StillThere,
 	StillHere, 
 	ConnectionLost
@@ -29,7 +31,13 @@ enum class PlayerAction : unsigned int {
 	MoveNorth,
 	MoveSouth,
 	Drop,
-	Attack,
+	Hurt
+};
+
+enum class SpawnCodes : unsigned int {
+	Player,
+	Wizard,
+	Troll
 };
 
 // Set requestID to any non-zeronummer to make the struct 
@@ -38,6 +46,7 @@ struct NetworkStruct {
 	unsigned int requestID = 0;
 	unsigned int timestamp = 0;
 	MessageCode code;
+	virtual ~NetworkStruct() {};
 };
 
 
@@ -45,8 +54,12 @@ struct NetworkStruct {
 //Room info
 //-------------------------------------------------//
 struct RoomStruct : NetworkStruct {
-	RoomStruct () {code = MessageCode::RoomMessage;}
+	RoomStruct ();
+	virtual ~RoomStruct() override;
 	int id;
+	//std::vector<PlayerStruct*> players;
+	//std::vector<EnemyStruct*> enemies;
+	//std::vector<unsigned int> items;
 };
 
 int SendRoomStruct(RoomStruct& strc, int socket);
@@ -58,7 +71,8 @@ int ReadRoomStruct(RoomStruct& strc, int socket);
 // Attack
 //-------------------------------------------------//
 struct AttackStruct : NetworkStruct{
-	AttackStruct() {code = MessageCode::AttackMessage;}
+	AttackStruct();
+	virtual ~AttackStruct() override;
 	int attackerID;
 	int targetID;
 	int damage;
@@ -73,7 +87,8 @@ int SendAttackStruct(AttackStruct& strc, int socket);
 //Enemy info
 //-------------------------------------------------//
 struct EnemyStruct : NetworkStruct{
-	EnemyStruct() {code = MessageCode::EnemyMessage;}
+	EnemyStruct();
+	virtual ~EnemyStruct() override;
 	int id;
 	int attackPoint;
 };
@@ -87,7 +102,8 @@ int ReadEnemyStruct(EnemyStruct& strc, int socket);
 //Spawn
 //-------------------------------------------------//
 struct SpawnStruct : NetworkStruct {
-	SpawnStruct() {code = MessageCode::SpawnMessage;}
+	SpawnStruct();
+	virtual ~SpawnStruct() override;
 	int roomID;
 	int monsterID;
 };
@@ -125,7 +141,7 @@ struct PlayerStruct : NetworkStruct{
 	int nameBufferSize;
 	char* name;
 	PlayerStruct(int size = 1024);
-	~PlayerStruct();
+	virtual ~PlayerStruct() override;
 };
 
 
@@ -136,21 +152,11 @@ int ReadPlayerStruct(PlayerStruct& strc, int socket);
 //Message
 //-------------------------------------------------//
 struct MessageStruct : NetworkStruct{
-	int senderID;
-	int receiverID;
 	int textSize;
 	int textBufferSize;
 	char* text;
-		MessageStruct(int size = 1024) {
-		code = MessageCode::MessageMessage;
-		requestID = 0;
-		textBufferSize = size;
-		text = new char[textBufferSize]();
-	}
-
-	~MessageStruct() {
-		delete [] text;
-	}
+	MessageStruct(int size = 1024);
+	virtual ~MessageStruct() override;
 };
 
 int ReadMessageStruct(MessageStruct& strc, int socket);
@@ -159,6 +165,17 @@ int SendMessageStruct(MessageStruct& strc, int socket);
 
 
 //----------------------------------------------------
+
+struct ItemStruct : NetworkStruct {
+	unsigned int type;
+	unsigned int id;
+	ItemStruct();
+	virtual ~ItemStruct() override;
+};
+
+int ReadItemStruct(ItemStruct& strc, int socket);
+
+int SendItemStruct(ItemStruct& strc, int socket);
 
 
 /**
