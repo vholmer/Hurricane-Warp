@@ -115,15 +115,6 @@ void ClientHandler::HandleInput(int socket) {
 			SendInt((int)MessageCode::StillHere, socket);
 			break;
 			}
-		case MessageCode::MessageMessage :{
-			std::cout << "Message" << std::endl;
-			MessageStruct* tmp = new MessageStruct();
-			ReadMessageStruct(*tmp, socket);
-			std::cout << "Server said: " << std::endl;
-			std::cout << tmp->text << std::endl; 
-			strc = tmp;
-			break;
-			}
 		case MessageCode::ConnectionLost : {
 			std::cout << "Damn" << std::endl;
 			std::cout << "Server is down" << std::endl;
@@ -133,7 +124,7 @@ void ClientHandler::HandleInput(int socket) {
 				std::cout << "Something has gone completely wrong" << std::endl;
 				return;
 			}
-			endConnection(socket);
+			endConnection();
 			break;
 			}
 		case MessageCode::MessageMessage : {
