@@ -71,6 +71,7 @@ bool Server::start(char* c) {
     } 
     //Start a thread which listens to the clients
 	this->thread_starter = std::async(std::launch::async, &Server::client_listener, this);
+	return true;
 }
 
 /*

@@ -124,7 +124,7 @@ void ClientHandler::HandleInput(int socket) {
 			std::cout << "Protocol error" << std::endl;
 		}
 	}
-	engine->parseInput(this, std::string(strc.text, strc.textSize));
+	engine->parseInput(this, std::string(strc->text, strc->textSize));
 	delete strc;
 }
 
