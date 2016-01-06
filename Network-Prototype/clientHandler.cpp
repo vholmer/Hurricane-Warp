@@ -110,43 +110,6 @@ void ClientHandler::HandleInput(int socket) {
 	std::cout << "We got: " << read << std::endl;
 	NetworkStruct* strc = NULL;
 	switch (code) {
-		case MessageCode::Default : {
-			std::cout << "Default" << std::endl;
-			break;
-			}
-		case MessageCode::RoomMessage : {
-			std::cout << "Room" << std::endl;
-			RoomStruct* tmp = new RoomStruct();
-			ReadRoomStruct(*tmp, socket);
-			std::cout << "id:" << tmp->id << std::endl;
-			strc = tmp;
-			break;
-			}	
-		case MessageCode::AttackMessage : {
-			std::cout << "Attack" << std::endl;
-			AttackStruct* tmp = new AttackStruct();
-			ReadAttackStruct(*tmp, socket);
-			std::cout << "attacker:" << tmp->attackerID << std::endl;
-			std::cout << "target:" << tmp->targetID << std::endl;
-			std::cout << "damage:" << tmp->damage << std::endl;
-			strc = tmp;
-			break;
-			}
-		case MessageCode::EnemyMessage : {
-			std::cout << "Enemy" << std::endl;
-
-			break;
-			}
-		case MessageCode::PlayerMessage : {
-			std::cout << "Player" << std::endl;
-			PlayerStruct* tmp = new PlayerStruct();
-			ReadPlayerStruct(*tmp, socket);
-			std::cout << "id:" << tmp->id << std::endl;
-			std::cout << "name size:" << tmp->namesize << std::endl;
-			std::cout << "name:" << tmp->name << std::endl;
-			strc = tmp;		
-			break;
-			}
 		case MessageCode::MessageMessage : {
 			std::cout << "Message" << std::endl;
 			MessageStruct* tmp = new MessageStruct();
@@ -157,22 +120,11 @@ void ClientHandler::HandleInput(int socket) {
 			strc = tmp; 
 			break;
 			}
-		case MessageCode::StillHere : {
-			this->clientDead = false;
-			break;
-			}
-		case MessageCode::ConnectionLost : {
-			std::cout << "End connection" << std::endl;
-			std::cout << "We are done here" << std::endl;
-			int i = (int) MessageCode::ConnectionLost;
-			SendInt(i, socket);
-			this->quitConnection();
-			break;
-			}
 		default : {
-			std::cout << "Random input" << std::endl;
+			std::cout << "Protocol error" << std::endl;
 		}
 	}
+	engine->parseInput(this, std::string(strc.text, strc.textSize));
 	delete strc;
 }
 
@@ -180,7 +132,9 @@ void ClientHandler::HandleInput(int socket) {
 /*
  
 */
-ClientHandler::ClientHandler() {}
+ClientHandler::ClientHandler(Engine* engine) {
+	this->engine = engine;
+}
 
 /*
 
@@ -262,13 +216,14 @@ void ClientHandler::sendSpawn() {
 } */
 
 void ClientHandler::sendMessage(std::string s) {
+	send_mutex.lock();
 	MessageStruct strc;
 	strc.textSize = s.size() + 1;
 	std::cout << "Gonna convert: " << s << std::endl;
 	SetContentCharArray(s, strc.text, strc.textSize);
 	std::cout << "Sending: " << strc.text << std::endl;
 	int n = SendMessageStruct(strc, socket.load());
-
+	send_mutex.unlock();
 }
 
 /*

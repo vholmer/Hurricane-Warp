@@ -11,6 +11,7 @@
 
 #include "network.hpp"
 #include "../Game-Prototype/room.hpp"
+#include "../Game-Prototype/engine.hpp"
 
 #include <chrono>
 #include <future>   
@@ -19,7 +20,7 @@
 #include <queue>
 #include <unistd.h>
 #include <atomic>
-
+#include <mutex>
 #include "socket.hpp"
 
 using namespace std;
@@ -35,11 +36,13 @@ class ClientHandler {
 		string ip_adress;
 
 		atomic<int> socket;
+
+
+		std::mutex send_mutex;
 		//atomic<queue<NetworkStruct*>> input;
 		//atomic<queue<NetworkStruct*>> output;
 
-		queue<std::string> input;
-
+		Engine* engine;
 
 		future<void> out_thr; // Future objects which referenses the output thread
 		future<void> in_thr; // Future objects which referenses the input thread
@@ -68,7 +71,7 @@ class ClientHandler {
 		Create a client which listens to the socket
 		(the socket needs to have been accepted)
 		*/
-		ClientHandler();
+		ClientHandler(Engine* engine);
 
 		void HandleInput(int socket);
 

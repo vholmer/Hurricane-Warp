@@ -37,11 +37,12 @@ void Server::client_listener() {
          	if (newsockfd < 0) 
              	server_error("ERROR on accept");
          	else {
-         		ClientHandler* cl = new ClientHandler;
+         		ClientHandler* cl = new ClientHandler(engine);
          		(*cl).start(newsockfd, cli_addr);
          		std::cout << (*cl).getIP();
          		this->list_mutex.lock();
-         		this->client_list.push_back(cl);
+         		engine->addPlayer(cl);
+         		//this->client_list.push_back(cl);
          		this->list_mutex.unlock();
          	}
         }
@@ -49,6 +50,11 @@ void Server::client_listener() {
 }
 
 Server::Server() : client_list() , kill_everythread(false){
+	this->engine = new Engine();
+}
+
+Server::~Server() {
+	delete this->engine;
 }
 
 bool Server::start(char* c) {
@@ -77,14 +83,17 @@ bool Server::stop() {
 	thread_starter.wait(); // Wait for the thread to finish
 	std::cout << "Close socket" << std::endl;
 	close(this->sockfd); // close socket
-	this->list_mutex.lock(); // lock the list
+	//this->list_mutex.lock(); // lock the list
 	std::cout << "locking list" << std::endl;
-	for(ClientHandler* c: client_list) {
+	engine->killConnections();
+	engine->memHandle();
+	/*for(ClientHandler* c: client_list) {
 		std::cout << "Deletes clients" << std::endl;
 		(*c).quitConnection(); // Kill all clients
 		delete c; // delete list
 	}
-	this->list_mutex.unlock(); // unlock the list
+	*/
+	//this->list_mutex.unlock(); // unlock the list
 	return true; //TODO
 	std::cout << "Server is killed" << std::endl;
 }

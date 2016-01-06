@@ -16,12 +16,16 @@
 #include <unistd.h>
 #include <atomic>
 #include "clientHandler.hpp"
+#include "../Game-Prototype/engine.hpp"
 
 using namespace std;
 
+struct Engine;
+
 class Server {
 	private:
-	
+		Engine* engine;
+
 		int sockfd;
 		int portn;
 		struct sockaddr_in serv_addr;
@@ -37,6 +41,8 @@ class Server {
 	public:
 	
 		Server();
+		
+		~Server();
 
 		bool start(char* c);
 
