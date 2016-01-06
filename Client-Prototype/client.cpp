@@ -119,6 +119,8 @@ void Client::HandleInput(int socket) {
 			////std::cout << "Random input" << std::endl;
 		}
 	}
+	if(strc != NULL)
+		std::cout << strc->text << std::endl;
 	delete strc;
 }
 
