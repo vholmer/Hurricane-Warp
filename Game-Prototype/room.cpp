@@ -20,6 +20,7 @@ void Room::addItem(Item* item) {
 
 void Room::addChar(Actor* actor) {
 	this->charsInRoom.push_back(actor);
+	actor->currentRoom = this;
 }
 
 void Room::removeItem(Item* item) {

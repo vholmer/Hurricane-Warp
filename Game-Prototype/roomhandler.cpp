@@ -1,12 +1,14 @@
 #include "roomhandler.hpp"
+#include "wizard.hpp"
 
 #include <iostream>
 
 using namespace std;
 
+struct Wizard;
+
 RoomHandler::RoomHandler() {
-	// This method will initiate all rooms
-	// How to initiate a room:
+	// ----- ROOM INITIATIONS BEGIN -----
 
 	Room* startRoom = new Room(1,
 		string(
@@ -28,11 +30,25 @@ RoomHandler::RoomHandler() {
 
 	startRoom->addItem(knife);
 	startRoom->exits[EAST] = clearing;
-	this->gameMap.push_back(startRoom);
 
 	clearing->addItem(milk);
 	clearing->exits[WEST] = startRoom;
+
+	this->gameMap.push_back(startRoom);
 	this->gameMap.push_back(clearing);
+
+	// ----- ROOM INITIATIONS END -----
+
+	// ----- ACTOR INITIATIONS BEGIN -----
+
+	Wizard* wizard = new Wizard(1,
+		string("Snilsson"),
+		string("An evil wizard, breaking for-loops since 1984.")
+		);
+
+	clearing->addChar(wizard);
+
+	// ----- ACTOR INITIATIONS END -----
 }
 
 Room* RoomHandler::start() {

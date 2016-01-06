@@ -87,7 +87,8 @@ bool Parser::processCommand() {
 		secondWord = toLowerCase(input[1]);
 
 	if(commands.find(firstWord) != commands.end()) {
-		return funcMap[commands[firstWord]](secondWord);
+		cmd token = commands[firstWord];
+		return funcMap[token](secondWord);
 	}
 	cout << "What do you mean?" << endl;
 	return false;

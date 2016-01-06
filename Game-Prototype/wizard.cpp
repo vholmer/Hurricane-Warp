@@ -1,9 +1,9 @@
 #include "wizard.hpp"
 
-Wizard::Wizard(string name, string description, Room* spawnRoom) {
+Wizard::Wizard(int id, string name, string description) {
+	this->actorID = id;
 	this->name = name;
 	this->description = description;
-	this->currentRoom = spawnRoom;
 
 	this->dialogue = "I will curse you thoroughly!";
 

@@ -22,6 +22,14 @@ struct Player {
 
 	unordered_map<string, Room*> getExitMap();
 
+	void printRoomDescription();
+
+	void printActors();
+
+	void printItems();
+
+	void printExits();
+
 	void roomInfo();
 };
 

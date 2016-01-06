@@ -21,6 +21,7 @@ struct Actor {
 	string description;
 	string dialogue;
 
+	int actorID;
 	int health;
 	int damageBase;
 
