@@ -102,6 +102,8 @@ void Engine::parseInput(ClientHandler* ch, string str) {
 		ch->sendMessage(this->parser->printIntro());
 		p->roomInfo(ch);
 		p->health = 100;
+		globalMutex.unlock();
+		return;
 	}
 	parser->processCommand(p, ch, str);
 	globalMutex.unlock();
