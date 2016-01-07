@@ -20,6 +20,8 @@ struct Player {
 	vector<Item> inventory;
 	int health;
 
+	bool askedForName;
+
 	Player();
 
 	Room* getRoomInDir(string dir);

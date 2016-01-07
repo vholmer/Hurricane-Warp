@@ -1,19 +1,42 @@
-#include <iostream>
-#include <mutex>
-#include <unordered_map>
-
 #include "engine.hpp"
 
 using namespace std;
 
 mutex globalMutex;
+mutex deleteMutex;
 
 Engine::Engine() {
 	this->parser = new Parser();
 	this->roomHandler = new RoomHandler();
+	this->spin = true;
+	this->managerThread = async(std::launch::async, &Engine::clientManager, this);
+}
+
+void Engine::clientManager() {
+	while(this->spin) {
+		usleep(100000);
+		for(pair<Player*, ClientHandler*> p : this->playerToClient) {
+			if(p.second->objectDead) {
+				deleteClient(p.first, p.second);
+				this->playerToClient.erase(p.first);
+				this->clientToPlayer.erase(p.second);
+			}
+			break;
+		}
+	}
+}
+
+void Engine::deleteClient(Player* p, ClientHandler* ch) {
+	deleteMutex.lock();
+	p->currentRoom->removePlayer(p);
+	delete ch;
+	delete p;
+	deleteMutex.unlock();
 }
 
 void Engine::memHandle() {
+	this->spin = false;
+	this->managerThread.wait();
 	delete this->parser;
 	for(pair<Player*, ClientHandler*> p : this->playerToClient) {
 		delete p.first;
@@ -37,14 +60,6 @@ void Engine::killConnections() {
 	}
 }
 
-string Engine::printIntro() {
-	string retString;
-	retString += "\nYou have crashed on a mysterious planet!\n";
-	retString += "In the name of the Emperor, good luck.\n";
-	retString += "What do you do?\n\n";
-	return retString;
-}
-
 void Engine::tickActors() {
 	globalMutex.lock();
 	for(Room* room : this->roomHandler->gameMap) {
@@ -60,8 +75,9 @@ void Engine::addPlayer(ClientHandler* c, string name) {
 	p->name = name;
 	p->currentRoom = this->roomHandler->start();
 	this->roomHandler->start()->addPlayer(p);
-	c->sendMessage(this->printIntro());
-	p->roomInfo(c);
+	if(p->askedForName == false) {
+		c->sendMessage(string("What is your name?\n> "));
+	}
 	this->clientToPlayer[c] = p;
 	this->playerToClient[p] = c;
 }

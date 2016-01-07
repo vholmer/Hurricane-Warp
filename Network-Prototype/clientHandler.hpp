@@ -67,6 +67,8 @@ class ClientHandler {
 
 	public:
 
+		bool objectDead;
+
 		//queue<string> input; // queue which holds all the input 
 		//queue<string> output; // queue which holds all the ouput
 
@@ -92,10 +94,10 @@ class ClientHandler {
 		End the current client connection and closes all the sockets
 		returns true if connection was properly closed
 		*/
-		bool endConnection();
+		void endConnection();
 
 
-		bool quitConnection();
+		void quitConnection();
 
 		/*
 		Returns true if the client handler can be endd

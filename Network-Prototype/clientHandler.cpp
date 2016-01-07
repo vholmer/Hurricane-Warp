@@ -109,6 +109,7 @@ void ClientHandler::HandleInput(int socket) {
 	MessageCode code = (MessageCode) read;
 	std::cout << "We got: " << read << std::endl;
 	MessageStruct* strc = NULL;
+	bool objectDead = false;
 	switch (code) {
 		case MessageCode::StillThere : {
 			std::cout << "Server asked if  I am still here" << std::endl;
@@ -126,6 +127,7 @@ void ClientHandler::HandleInput(int socket) {
 			int i = (int) MessageCode::ConnectionLost;
 			SendInt(i, socket);
 			this->quitConnection();
+			objectDead = true;
 			break;
 			}
 		case MessageCode::MessageMessage : {
@@ -154,6 +156,7 @@ void ClientHandler::HandleInput(int socket) {
 */
 ClientHandler::ClientHandler(Engine* engine) {
 	this->engine = engine;
+	this->objectDead = false;
 }
 
 /*
@@ -179,30 +182,29 @@ bool ClientHandler::start(int sock, struct sockaddr_in &cli_addr) {
 /*
 	End the connection
 */
-bool ClientHandler::endConnection() {
-		kill_everythread = true;
-		close(this->socket.load()); // close socket
-		std::cout << "Tråden är färdig" << std::endl;
-		return true;
+void ClientHandler::endConnection() {
+	kill_everythread = true;
+	close(this->socket.load()); // close socket
+	std::cout << "Tråden är färdig" << std::endl;
 }
 
-bool ClientHandler::quitConnection() {
-		std::cout << "End connection" << std::endl;
-		if(kill_everythread.load()) {
-			//out_thr.wait();
-			in_thr.wait();
-			return true;
-		}
-		int end = (int) MessageCode::ConnectionLost;
-		SendInt(end, this->socket.load());
+void ClientHandler::quitConnection() {
+	std::cout << "End connection" << std::endl;
+	if(kill_everythread.load()) {
+		//out_thr.wait();
+		in_thr.wait();
+		return;
+	}
+	int end = (int) MessageCode::ConnectionLost;
+	SendInt(end, this->socket.load());
 
-		int done = (int) MessageCode::ConnectionLost;
-		int ret = 0;
-		do {
-			ReadInt(&ret, this->socket);
-		} while(ret != done);
+	int done = (int) MessageCode::ConnectionLost;
+	int ret = 0;
+	do {
+		ReadInt(&ret, this->socket);
+	} while(ret != done);
 
-		return this->endConnection();
+	this->endConnection();
 }
 
 /*

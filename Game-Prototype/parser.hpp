@@ -43,6 +43,8 @@ struct Parser {
 
 	string toLowerCase(string str);
 
+	string printIntro();
+
 	void processCommand(Player* p, ClientHandler* ch, string str);
 };
 

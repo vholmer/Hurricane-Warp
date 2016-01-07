@@ -66,9 +66,28 @@ string Parser::toLowerCase(string str) {
 	return result;
 }
 
+string Parser::printIntro() {
+	string retString;
+	retString += "You have crashed on a mysterious planet!\n";
+	retString += "In the name of the Emperor, good luck.\n";
+	retString += "What do you do?\n\n";
+	return retString;
+}
+
 void Parser::processCommand(Player* p, ClientHandler* ch, string str) {
 	this->setUpLambdas(p, ch);
 	vector<string> input = getInput(str);
+
+	if(p->askedForName == false) {
+		if(input.size() > 2) {
+			ch->sendMessage(string("Name too long!\n"));
+		}
+		p->name = str;
+		p->askedForName = true;
+		ch->sendMessage(this->printIntro());
+		p->roomInfo(ch);
+		return;
+	}
 
 	string firstWord = toLowerCase(input[0]);
 	string secondWord;

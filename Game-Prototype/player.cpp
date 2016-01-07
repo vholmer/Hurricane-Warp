@@ -2,6 +2,7 @@
 
 Player::Player() {
 	this->health = 10;
+	this->askedForName = false;
 }
 
 Room* Player::getRoomInDir(string dir) {

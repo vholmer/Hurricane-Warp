@@ -3,6 +3,11 @@
 
 #include <vector>
 #include <unordered_map>
+#include <iostream>
+#include <mutex>
+#include <thread>
+#include <future>
+#include <unistd.h>
 
 #include "parser.hpp"
 #include "player.hpp"
@@ -20,21 +25,27 @@ struct Engine {
 	unordered_map<ClientHandler*, Player*> clientToPlayer;
 	RoomHandler* roomHandler;
 
+	bool spin;
+
+	future<void> managerThread;
+
 	Engine();
 
 	~Engine() {
 		memHandle();
 	}
 
+	void clientManager();
+
+	void deleteClient(Player* p, ClientHandler* ch);
+
 	void memHandle();
 
 	void killConnections();
 
-	string printIntro();
-
 	void tickActors();
 
-	void addPlayer(ClientHandler* c, string name);
+	void addPlayer(ClientHandler* c, string name = "");
 
 	void parseInput(ClientHandler* ch, string str);
 
