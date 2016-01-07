@@ -90,9 +90,10 @@ string Parser::printIntro() {
 }
 
 void Parser::broadcastFromPlayer(Player* p) {
-	for(pair<Player*, ClientHandler*> pair : this->engine->playerToClient) {
-		if(pair.first != p) {
-			pair.second->sendMessage(string(p->name + " has entered the room.\n"));
+	for(Player* otherInRoom : p->currentRoom->playersInRoom) {
+		if(otherInRoom != p) {
+			ClientHandler* ch = this->engine->playerToClient[otherInRoom];
+			ch->sendMessage(string("\n" + p->name + " has entered the room.\n> "));
 		}
 	}
 }
