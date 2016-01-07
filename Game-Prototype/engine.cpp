@@ -76,6 +76,18 @@ void Engine::tickActors() {
 	}
 }
 
+void Engine::checkHealth(Player* p, ClientHandler* ch) {
+	ch->canSend = false;
+	Room* prevRoom = p->currentRoom;
+	this->roomHandler->start()->addPlayer(p);
+	prevRoom->removePlayer(p);
+	ch->canSend = true;
+	ch->sendMessage(string("It is better to live for the emperor, than to die for yourself.\n"));
+	ch->sendMessage(this->parser->printIntro());
+	p->roomInfo(ch);
+	p->health = 100;
+}
+
 void Engine::addPlayer(ClientHandler* c, string name) {
 	Player* p = new Player();
 	p->name = name;
@@ -93,15 +105,7 @@ void Engine::parseInput(ClientHandler* ch, string str) {
 	globalMutex.lock();
 	Player* p = this->clientToPlayer[ch];
 	if(p->health <= 0) {
-		ch->canSend = false;
-		Room* prevRoom = p->currentRoom;
-		this->roomHandler->start()->addPlayer(p);
-		prevRoom->removePlayer(p);
-		ch->canSend = true;
-		ch->sendMessage(string("It is better to live for the emperor, than to die for yourself.\n"));
-		ch->sendMessage(this->parser->printIntro());
-		p->roomInfo(ch);
-		p->health = 100;
+		checkHealth(p, ch);
 		globalMutex.unlock();
 		return;
 	}

@@ -46,6 +46,8 @@ struct Engine {
 
 	void tickActors();
 
+	void checkHealth(Player* p, ClientHandler* ch);
+
 	void addPlayer(ClientHandler* c, string name = "");
 
 	void parseInput(ClientHandler* ch, string str);

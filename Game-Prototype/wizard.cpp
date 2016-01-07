@@ -14,6 +14,7 @@ Wizard::Wizard(string name, string description) {
 // Next level AI right here
 void Wizard::act(Engine* engine) {
 	this->mana += 1;
+	Player* randomPlayer = this->playerInRoom();
 	if(this->health <= 0) {
 		this->currentRoom->removeChar(this);
 		auto begin = engine->roomHandler->npcMap.begin();
@@ -27,19 +28,21 @@ void Wizard::act(Engine* engine) {
 		delete this;
 		return;
 	}
-	/*if(this->health < 3) {
-		this->walk();
+	if(this->health < 3) {
+		this->walk(engine);
 		return;
 	}
-	if(this->mana >= 5 && this->playerInRoom() != 0) {
-		this->enchant(this->playerInRoom());
+	if(this->mana >= 5 && randomPlayer != 0) {
+		this->enchant(randomPlayer);
 		this->mana -= 3;
+		engine->checkHealth(randomPlayer, engine->playerToClient[randomPlayer]);
 		return;
-	} else if(this->playerInRoom() != 0) {
-		this->fight(this->playerInRoom());
+	} else if(randomPlayer != 0) {
+		this->fight(randomPlayer);
+		engine->checkHealth(randomPlayer, engine->playerToClient[randomPlayer]);
 		return;
 	}
-	this->walk(engine);*/
+	this->walk(engine);
 }
 
 void Wizard::enchant(Actor* a) {
