@@ -31,8 +31,19 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 		ch->sendMessage(string("God can't help you now!\n> "));
 	};
 
-	this->funcMap[cmd::INVENTORY] = [this, ch] (string secondWord = "") {
-		ch->sendMessage(string("You have nothing!\n> "));
+	this->funcMap[cmd::INVENTORY] = [this, p, ch] (string secondWord = "") {
+		ch->sendMessage(p->printInventory());
+	};
+
+	this->funcMap[cmd::TAKE] = [this, p, ch] (string secondWord = "") {
+		for(Item* inRoom : p->currentRoom->itemsInRoom) {
+			if(toLowerCase(inRoom->name) == secondWord) {
+				p->addItem(inRoom);
+				ch->sendMessage(string("Added " + inRoom->name + " to inventory.\n> "));
+				return;
+			}
+		}
+		ch->sendMessage(string("That item is not here.\n> "));
 	};
 }
 
@@ -41,6 +52,8 @@ void Parser::setUpCommands() {
 	this->commands["look"] = cmd::LOOK;
 	this->commands["help"] = cmd::HELP;
 	this->commands["inventory"] = cmd::INVENTORY;
+	this->commands["take"] = cmd::TAKE;
+	this->commands["drop"] = cmd::DROP;
 }
 
 vector<string> Parser::getInput(string str) {

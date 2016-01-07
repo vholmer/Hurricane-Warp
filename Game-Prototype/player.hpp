@@ -17,7 +17,7 @@ struct ClientHandler;
 struct Player {
 	string name;
 	Room* currentRoom;
-	vector<Item> inventory;
+	vector<Item*> inventory;
 	int health;
 
 	bool askedForName;
@@ -37,6 +37,12 @@ struct Player {
 	string printItems();
 
 	string printExits();
+
+	string printInventory();
+
+	void addItem(Item* item);
+
+	void dropItem(Item* item);
 
 	void roomInfo(ClientHandler* ch);
 };
