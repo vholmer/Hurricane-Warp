@@ -83,8 +83,9 @@ void Client::HandleInput(int socket) {
 			////std::cout << "Random input" << std::endl;
 		}
 	}
-	if(strc != NULL)
+	if(strc != NULL) {
 		std::cout << strc->text << std::endl;
+	}
 	delete strc;
 }
 
@@ -157,7 +158,6 @@ void Client::send(int socket, string s) {
 */
 void Client::client_process(int socket) {
 	while(1) {
-
 		if(this->kill_everythread.load()) {
 			//std::cout << "We are closing our connection" << std::endl;
 			close(socket);
@@ -168,16 +168,14 @@ void Client::client_process(int socket) {
 	    fd_set fds;
 	    tv.tv_sec = 3; // Set time out to 3 sec
 	    tv.tv_usec = 0; // Set return code to 0
-	    
 	    FD_ZERO(&fds); // empty fds
 	    FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
-
 	    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv); //wait for std:cin input or timeout
 	    int n = FD_ISSET(STDIN_FILENO, &fds);
-
 	    if(n != 0) { // if no timeout
 	    	string s;
 	    	getline(cin, s);
+	    	std::cout << "\n";
 
 	    	if(s == "Exit") {
 	    		std::cout << "We are exiting" << std::endl;

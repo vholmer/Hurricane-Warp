@@ -4,10 +4,10 @@ Parser::Parser() {
 	setUpCommands();
 }
 
-void Parser::setUpLambdas(Player* p) {
-	this->funcMap[cmd::GO] = [this, p] (string secondWord = "") {
+void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
+	this->funcMap[cmd::GO] = [this, p, ch] (string secondWord = "") {
 		if(secondWord == "") {
-			cout << "Go where?" << endl;
+			ch->sendMessage(string("Go where?\n"));;
 			return false;
 		}
 		if(p->getExitMap().find(secondWord) != p->getExitMap().end()) {
@@ -16,21 +16,21 @@ void Parser::setUpLambdas(Player* p) {
 				Room* prevRoom = p->currentRoom;
 				nextRoom->addPlayer(p);
 				prevRoom->removePlayer(p);
-				p->roomInfo();
+				p->roomInfo(ch);
 			}
 		} else {
-			cout << "You can't go there." << endl;
+			ch->sendMessage(string("You can't go there.\n"));
 		}
 		return false;
 	};
 
-	this->funcMap[cmd::LOOK] = [this, p] (string secondWord = "") {
-		p->roomInfo();
+	this->funcMap[cmd::LOOK] = [this, p, ch] (string secondWord = "") {
+		p->roomInfo(ch);
 		return false;
 	};
 
-	this->funcMap[cmd::HELP] = [this] (string secondWord = "") {
-		cout << "God can't help you now!" << endl;
+	this->funcMap[cmd::HELP] = [this, ch] (string secondWord = "") {
+		ch->sendMessage(string("God can't help you now!\n"));
 		return false;
 	};
 
@@ -38,8 +38,8 @@ void Parser::setUpLambdas(Player* p) {
 		return true;
 	};
 
-	this->funcMap[cmd::INVENTORY] = [this] (string secondWord = "") {
-		cout << "You have nothing!" << endl;
+	this->funcMap[cmd::INVENTORY] = [this, ch] (string secondWord = "") {
+		ch->sendMessage(string("You have nothing!\n"));
 		return false;
 	};
 }
@@ -75,9 +75,8 @@ string Parser::toLowerCase(string str) {
 	return result;
 }
 
-bool Parser::processCommand(Player* p, string str) {
-	this->setUpLambdas(p);
-	cout << "> ";
+bool Parser::processCommand(Player* p, ClientHandler* ch, string str) {
+	this->setUpLambdas(p, ch);
 	vector<string> input = getInput(str);
 
 	string firstWord = toLowerCase(input[0]);
@@ -89,6 +88,6 @@ bool Parser::processCommand(Player* p, string str) {
 		cmd token = commands[firstWord];
 		return this->funcMap[token](secondWord);
 	}
-	cout << "What do you mean?" << endl;
+	ch->sendMessage(string("What do you mean?\n"));
 	return false;
 }

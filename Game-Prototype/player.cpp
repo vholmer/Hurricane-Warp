@@ -12,35 +12,56 @@ unordered_map<string, Room*> Player::getExitMap() {
 	return this->currentRoom->exits;
 }
 
-void Player::printRoomDescription() {
-	cout << endl << this->currentRoom->description << endl;
+string Player::printRoomDescription() {
+	string retString;
+	retString += this->currentRoom->description + "\n";
+	return retString;
 }
 
-void Player::printActors() {
+string Player::printActors() {
+	string retString;
 	for(Actor* actor : this->currentRoom->charsInRoom) {
-		cout << actor->name << " is here. " << actor->description << endl;
+		retString += actor->name + " is here. ";
+		retString += actor->description + "\n";
 	}
+	return retString;
 }
 
-void Player::printItems() {
-	cout << "Items in room: ";
+string Player::printPlayers() {
+	string retString;
+	for(Player* p : this->currentRoom->playersInRoom) {
+		retString += p->name + " is here. ";
+	}
+	return retString;
+}
+
+string Player::printItems() {
+	string retString;
+	retString += "Items in room: ";
 	for(Item* item : this->currentRoom->itemsInRoom) {
-		cout << item->name << " ";
+		retString += item->name + " ";
 	}
-	cout << endl;
+	if(retString.length() > 2)
+		retString += "\n";
+	return retString;
 }
 
-void Player::printExits() {
-	cout << "Exits: ";
+string Player::printExits() {
+	string retString;
+	retString += "Exits: ";
 	for(string s : this->currentRoom->getExits()) {
-		cout << s << " ";
+		retString += s + " ";
 	}
-	cout << endl;
+	if(retString.length() > 2)
+		retString += "\n";
+	return retString;
 }
 
-void Player::roomInfo() {
-	this->printRoomDescription();
-	this->printActors();
-	this->printItems();
-	this->printExits();
+void Player::roomInfo(ClientHandler* ch) {
+	string printString = this->printRoomDescription();
+	printString += this->printActors();
+	printString += this->printPlayers();
+	printString += this->printItems();
+	printString += this->printExits();
+	ch->sendMessage(printString);
 }

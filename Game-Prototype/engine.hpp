@@ -11,6 +11,7 @@
 struct Parser;
 struct Player;
 struct ClientHandler;
+struct RoomHandler;
 
 struct Engine {
 
@@ -33,13 +34,11 @@ struct Engine {
 
 	void tickActors();
 
-	void addPlayer(ClientHandler* c);
+	void addPlayer(ClientHandler* c, string name);
 
 	bool parseInput(ClientHandler* ch, string str);
 
 	//void startGameLoop();
-
-	void respawn();
 };
 
 #endif

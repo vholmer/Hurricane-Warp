@@ -11,10 +11,12 @@
 #include <functional>
 
 #include "player.hpp"
+#include "../Network-Prototype/clientHandler.hpp"
 
 using namespace std;
 
 struct Player;
+struct ClientHandler;
 
 struct Parser {
 
@@ -34,7 +36,7 @@ struct Parser {
 
 	Parser();
 
-	void setUpLambdas(Player* p);
+	void setUpLambdas(Player* p, ClientHandler* ch);
 
 	void setUpCommands();
 
@@ -42,7 +44,7 @@ struct Parser {
 
 	string toLowerCase(string str);
 
-	bool processCommand(Player* p, string str);
+	bool processCommand(Player* p, ClientHandler* ch, string str);
 };
 
 #endif

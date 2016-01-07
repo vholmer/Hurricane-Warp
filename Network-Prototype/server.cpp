@@ -41,7 +41,7 @@ void Server::client_listener() {
          		(*cl).start(newsockfd, cli_addr);
          		std::cout << (*cl).getIP();
          		this->list_mutex.lock();
-         		engine->addPlayer(cl);
+         		engine->addPlayer(cl, cl->getIP());
          		//this->client_list.push_back(cl);
          		this->list_mutex.unlock();
          	}

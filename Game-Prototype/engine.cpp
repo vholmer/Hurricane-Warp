@@ -55,10 +55,12 @@ void Engine::tickActors() {
 	globalMutex.unlock();
 }
 
-void Engine::addPlayer(ClientHandler* c) {
+void Engine::addPlayer(ClientHandler* c, string name) {
 	Player* p = new Player();
+	p->name = name;
 	p->currentRoom = this->roomHandler->start();
 	c->sendMessage(this->printIntro());
+	p->roomInfo(c);
 	this->clientToPlayer[c] = p;
 	this->playerToClient[p] = c;
 }
@@ -66,7 +68,7 @@ void Engine::addPlayer(ClientHandler* c) {
 bool Engine::parseInput(ClientHandler* ch, string str) {
 	globalMutex.lock();
 	Player* p = this->clientToPlayer[ch];
-	bool retBool = parser->processCommand(p, str);
+	bool retBool = parser->processCommand(p, ch, str);
 	globalMutex.unlock();
 	return retBool;
 }
@@ -80,7 +82,3 @@ bool Engine::parseInput(ClientHandler* ch, string str) {
 		}
 	}
 }*/
-
-void Engine::respawn() {
-	cout << "No respawns lol" << endl;
-}

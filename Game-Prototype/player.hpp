@@ -3,15 +3,19 @@
 
 #include <vector>
 #include <iostream>
+#include <string>
 
 #include "item.hpp"
 #include "roomhandler.hpp"
+#include "../Network-Prototype/clientHandler.hpp"
 
 using namespace std;
 
 struct Room;
+struct ClientHandler;
 
 struct Player {
+	string name;
 	Room* currentRoom;
 	vector<Item> inventory;
 	int health;
@@ -22,15 +26,17 @@ struct Player {
 
 	unordered_map<string, Room*> getExitMap();
 
-	void printRoomDescription();
+	string printRoomDescription();
 
-	void printActors();
+	string printActors();
 
-	void printItems();
+	string printPlayers();
 
-	void printExits();
+	string printItems();
 
-	void roomInfo();
+	string printExits();
+
+	void roomInfo(ClientHandler* ch);
 };
 
 #endif
