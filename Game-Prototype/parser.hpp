@@ -30,7 +30,8 @@ struct Parser {
 		HELP,
 		INVENTORY,
 		TAKE,
-		DROP
+		DROP,
+		FIGHT
 	};
 
 	map<cmd, std::function<void(string)> > funcMap;

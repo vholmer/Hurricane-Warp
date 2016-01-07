@@ -43,12 +43,12 @@ void Actor::printActor() {
 }
 
 void Actor::fight(Actor* a) {
-	int damage = rand() % damageBase;
+	int damage = rand() % damageBase + 1;
 	a->health -= damage;
 }
 
 void Actor::fight(Player* p) {
-	int damage = rand() % damageBase;
+	int damage = rand() % damageBase + 1;
 	p->health -= damage;
 }
 

@@ -13,13 +13,21 @@ Wizard::Wizard(string name, string description) {
 
 // Next level AI right here
 void Wizard::act(Engine* engine) {
-	/*this->mana += 1;
+	this->mana += 1;
 	if(this->health <= 0) {
 		this->currentRoom->removeChar(this);
+		auto begin = engine->roomHandler->npcMap.begin();
+		auto end = engine->roomHandler->npcMap.end();
+		for(auto i = begin; i != end; ++i) {
+			if(*i == this) {
+				engine->roomHandler->npcMap.erase(i);
+				engine->roomHandler->npcMap.shrink_to_fit();
+			}
+		}
 		delete this;
 		return;
 	}
-	if(this->health < 3) {
+	/*if(this->health < 3) {
 		this->walk();
 		return;
 	}
@@ -30,8 +38,8 @@ void Wizard::act(Engine* engine) {
 	} else if(this->playerInRoom() != 0) {
 		this->fight(this->playerInRoom());
 		return;
-	}*/
-	this->walk(engine);
+	}
+	this->walk(engine);*/
 }
 
 void Wizard::enchant(Actor* a) {

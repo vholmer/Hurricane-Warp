@@ -60,6 +60,35 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 		}
 		ch->sendMessage(string("You don't have that item.\n> "));
 	};
+
+	this->funcMap[cmd::FIGHT] = [this, p, ch] (string secondWord = "") {
+		for(Player* otherPlayer : p->currentRoom->playersInRoom) {
+			if(toLowerCase(otherPlayer->name) == secondWord) {
+				int damageDone = p->fightPlayer(otherPlayer);
+
+				ch->sendMessage(string("You hit "
+					+ otherPlayer->name
+					+ " for "
+					+ to_string(damageDone)
+					+ " damage.\n> "));
+
+				return;
+			}
+		}
+		for(Actor* actor : p->currentRoom->charsInRoom) {
+			if(toLowerCase(actor->name) == secondWord) {
+				int damageDone = p->fightActor(actor);
+
+				ch->sendMessage(string("You hit "
+					+ actor->name
+					+ " for "
+					+ to_string(damageDone)
+					+ " damage.\n> "));
+
+				return;
+			}
+		}
+	};
 }
 
 void Parser::setUpCommands() {
@@ -69,6 +98,7 @@ void Parser::setUpCommands() {
 	this->commands["inventory"] = cmd::INVENTORY;
 	this->commands["take"] = cmd::TAKE;
 	this->commands["drop"] = cmd::DROP;
+	this->commands["fight"] = cmd::FIGHT;
 }
 
 vector<string> Parser::getInput(string str) {

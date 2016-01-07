@@ -92,6 +92,16 @@ void Engine::addPlayer(ClientHandler* c, string name) {
 void Engine::parseInput(ClientHandler* ch, string str) {
 	globalMutex.lock();
 	Player* p = this->clientToPlayer[ch];
+	if(p->health <= 0) {
+		ch->canSend = false;
+		Room* prevRoom = p->currentRoom;
+		this->roomHandler->start()->addPlayer(p);
+		prevRoom->removePlayer(p);
+		ch->canSend = true;
+		ch->sendMessage(string("It is better to live for the emperor, than to die for yourself.\n"));
+		ch->sendMessage(this->parser->printIntro());
+		p->roomInfo(ch);
+	}
 	parser->processCommand(p, ch, str);
 	globalMutex.unlock();
 }

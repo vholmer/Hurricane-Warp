@@ -7,18 +7,21 @@
 
 #include "item.hpp"
 #include "roomhandler.hpp"
+#include "actor.hpp"
 #include "../Network-Prototype/clientHandler.hpp"
 
 using namespace std;
 
 struct Room;
 struct ClientHandler;
+struct Actor;
 
 struct Player {
 	string name;
 	Room* currentRoom;
 	vector<Item*> inventory;
 	int health;
+	int damageBase;
 
 	bool askedForName;
 
@@ -39,6 +42,10 @@ struct Player {
 	string printExits();
 
 	string printInventory();
+
+	int fightPlayer(Player* p);
+
+	int fightActor(Actor* a);
 
 	void addItem(Item* item);
 
