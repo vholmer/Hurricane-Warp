@@ -53,6 +53,8 @@ struct Parser {
 
 	void broadcastMovement(Player* p, Room* prevRoom);
 
+	void broadcastItem(Player* p, string itemName, bool pickedUp);
+
 	void processCommand(Player* p, ClientHandler* ch, string str);
 };
 

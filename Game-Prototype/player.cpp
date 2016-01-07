@@ -1,7 +1,7 @@
 #include "player.hpp"
 
 Player::Player() {
-	this->health = 10;
+	this->health = 100;
 	this->askedForName = false;
 }
 

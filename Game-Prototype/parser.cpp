@@ -42,6 +42,7 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 			if(toLowerCase(inRoom->name) == secondWord) {
 				p->addItem(inRoom);
 				ch->sendMessage(string("Added " + inRoom->name + " to inventory.\n> "));
+				this->broadcastItem(p, inRoom->name, true);
 				return;
 			}
 		}
@@ -53,6 +54,8 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 			if(secondWord == toLowerCase(item->name)) {
 				p->dropItem(item);
 				ch->sendMessage(string("Dropped " + item->name + ".\n> "));
+				this->broadcastItem(p, item->name, false);
+				return;
 			}
 		}
 		ch->sendMessage(string("You don't have that item.\n> "));
@@ -109,6 +112,18 @@ void Parser::broadcastMovement(Player* p, Room* prevRoom) {
 	for(Player* otherInRoom : prevRoom->playersInRoom) {
 		ClientHandler* ch = this->engine->playerToClient[otherInRoom];
 		ch->sendMessage(string("\n" + p->name + " has left the room.\n> "));
+	}
+}
+
+void Parser::broadcastItem(Player* p, string itemName, bool pickedUp) {
+	for(Player* otherInRoom : p->currentRoom->playersInRoom) {
+		if(otherInRoom != p) {
+			ClientHandler* ch = this->engine->playerToClient[otherInRoom];
+			if(pickedUp)
+				ch->sendMessage(string("\n" + p->name + " took " + itemName + "\n> "));
+			else
+				ch->sendMessage(string("\n" + p->name + " dropped " + itemName + "\n> "));
+		}
 	}
 }
 
