@@ -11,12 +11,14 @@
 #include <functional>
 
 #include "player.hpp"
+#include "engine.hpp"
 #include "../Network-Prototype/clientHandler.hpp"
 
 using namespace std;
 
 struct Player;
 struct ClientHandler;
+struct Engine;
 
 struct Parser {
 
@@ -29,13 +31,13 @@ struct Parser {
 		DROP
 	};
 
-	Player* player;
-
 	map<cmd, std::function<void(string)> > funcMap;
 
 	unordered_map<string, cmd> commands;
 
-	Parser();
+	Engine* engine;
+
+	Parser(Engine* engine);
 
 	void setUpLambdas(Player* p, ClientHandler* ch);
 
@@ -46,6 +48,8 @@ struct Parser {
 	string toLowerCase(string str);
 
 	string printIntro();
+
+	void broadcastFromPlayer(Player* p);
 
 	void processCommand(Player* p, ClientHandler* ch, string str);
 };

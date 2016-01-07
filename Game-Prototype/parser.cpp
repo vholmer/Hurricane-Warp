@@ -1,7 +1,8 @@
 #include "parser.hpp"
 
-Parser::Parser() {
+Parser::Parser(Engine* engine) {
 	setUpCommands();
+	this->engine = engine;
 }
 
 void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
@@ -17,6 +18,7 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 				nextRoom->addPlayer(p);
 				prevRoom->removePlayer(p);
 				p->roomInfo(ch);
+				this->broadcastFromPlayer(p);
 			}
 		} else {
 			ch->sendMessage(string("You can't go there.\n> "));
@@ -85,6 +87,14 @@ string Parser::printIntro() {
 	retString += "In the name of the Emperor, good luck.\n";
 	retString += "What do you do?\n\n";
 	return retString;
+}
+
+void Parser::broadcastFromPlayer(Player* p) {
+	for(pair<Player*, ClientHandler*> pair : this->engine->playerToClient) {
+		if(pair.first != p) {
+			pair.second->sendMessage(string(p->name + " has entered the room.\n"));
+		}
+	}
 }
 
 void Parser::processCommand(Player* p, ClientHandler* ch, string str) {

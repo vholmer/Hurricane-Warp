@@ -6,7 +6,7 @@ mutex globalMutex;
 mutex deleteMutex;
 
 Engine::Engine() {
-	this->parser = new Parser();
+	this->parser = new Parser(this);
 	this->roomHandler = new RoomHandler();
 	this->spin = true;
 	this->managerThread = async(std::launch::async, &Engine::clientManager, this);
