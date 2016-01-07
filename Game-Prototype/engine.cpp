@@ -20,8 +20,8 @@ void Engine::clientManager() {
 				deleteClient(p.first, p.second);
 				this->playerToClient.erase(p.first);
 				this->clientToPlayer.erase(p.second);
+				break;
 			}
-			break;
 		}
 	}
 }
@@ -29,6 +29,7 @@ void Engine::clientManager() {
 void Engine::deleteClient(Player* p, ClientHandler* ch) {
 	deleteMutex.lock();
 	p->currentRoom->removePlayer(p);
+	cout << "NAME DELETED: " << p->name << endl;
 	delete ch;
 	delete p;
 	deleteMutex.unlock();

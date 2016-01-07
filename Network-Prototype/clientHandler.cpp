@@ -109,7 +109,6 @@ void ClientHandler::HandleInput(int socket) {
 	MessageCode code = (MessageCode) read;
 	std::cout << "We got: " << read << std::endl;
 	MessageStruct* strc = NULL;
-	bool objectDead = false;
 	switch (code) {
 		case MessageCode::StillThere : {
 			std::cout << "Server asked if  I am still here" << std::endl;
@@ -127,7 +126,7 @@ void ClientHandler::HandleInput(int socket) {
 			int i = (int) MessageCode::ConnectionLost;
 			SendInt(i, socket);
 			this->quitConnection();
-			objectDead = true;
+			this->objectDead = true;
 			break;
 			}
 		case MessageCode::MessageMessage : {
