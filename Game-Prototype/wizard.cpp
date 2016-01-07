@@ -15,42 +15,31 @@ Wizard::Wizard(string name, string description) {
 void Wizard::act(Engine* engine) {
 	this->mana += 1;
 	Player* randomPlayer = this->playerInRoom();
-	if(this->health <= 0) {
-		this->currentRoom->removeChar(this);
-		auto begin = engine->roomHandler->npcMap.begin();
-		auto end = engine->roomHandler->npcMap.end();
-		for(auto i = begin; i != end; ++i) {
-			if(*i == this) {
-				engine->roomHandler->npcMap.erase(i);
-				engine->roomHandler->npcMap.shrink_to_fit();
-			}
-		}
-		delete this;
-		return;
-	}
 	if(this->health < 3) {
 		this->walk(engine);
 		return;
 	}
-	if(this->mana >= 5 && randomPlayer != 0) {
+	/*if(this->mana >= 5 && randomPlayer != 0) {
 		this->enchant(randomPlayer);
 		this->mana -= 3;
 		engine->checkHealth(randomPlayer, engine->playerToClient[randomPlayer]);
 		return;
-	} else if(randomPlayer != 0) {
-		this->fight(randomPlayer);
-		engine->checkHealth(randomPlayer, engine->playerToClient[randomPlayer]);
+	} else*/ if(randomPlayer != 0) {
+		int damage = this->fight(randomPlayer);
+		this->broadcastPlayerDamage(engine, randomPlayer, damage);
 		return;
 	}
 	this->walk(engine);
 }
 
-void Wizard::enchant(Actor* a) {
-	int damage = rand() % damageBase + 2;
+int Wizard::enchant(Actor* a) {
+	int damage = rand() % damageBase + 9;
 	a->health -= damage;
+	return damage;
 }
 
-void Wizard::enchant(Player* p) {
-	int damage = rand() % damageBase + 2;
+int Wizard::enchant(Player* p) {
+	int damage = rand() % damageBase + 29;
 	p->health -= damage;
+	return damage;
 }

@@ -3,59 +3,45 @@
 using namespace std;
 
 mutex globalMutex;
-mutex deleteMutex;
+mutex checkActMutex;
+mutex checkPlrMutex;
 
 Engine::Engine() {
 	this->parser = new Parser(this);
 	this->roomHandler = new RoomHandler();
 	this->spin = true;
-	this->managerThread = async(std::launch::async, &Engine::clientManager, this);
 	this->tickThread = async(std::launch::async, &Engine::tickActors, this);
 
 }
 
-void Engine::clientManager() {
-	while(this->spin) {
-		usleep(100000);
-		for(pair<Player*, ClientHandler*> p : this->playerToClient) {
-			if(p.second->objectDead) {
-				deleteClient(p.first, p.second);
-				this->playerToClient.erase(p.first);
-				this->clientToPlayer.erase(p.second);
-				break;
-			}
-		}
-	}
-}
-
-void Engine::deleteClient(Player* p, ClientHandler* ch) {
-	deleteMutex.lock();
-	p->currentRoom->removePlayer(p);
-	cout << "PLAYER DELETED: " << p->name << endl;
-	delete ch;
-	delete p;
-	deleteMutex.unlock();
-}
-
 void Engine::memHandle() {
 	this->spin = false;
-	this->managerThread.wait();
 	this->tickThread.wait();
+
 	delete this->parser;
+
 	for(pair<Player*, ClientHandler*> p : this->playerToClient) {
 		delete p.first;
 		delete p.second;
+
 	}
 	for(Room* room : this->roomHandler->gameMap) {
+
 		for(Item* item : room->itemsInRoom) {
 			delete item;
 		}
+
 		for(Actor* actor : room->charsInRoom) {
 			delete actor;
 		}
+
 		delete room;
+
 	}
+
 	delete this->roomHandler;
+
+	cout.flush();
 }
 
 void Engine::killConnections() {
@@ -68,24 +54,52 @@ void Engine::tickActors() {
 	while(this->spin) {
 		int sleepSeconds = (rand() % 7) + 6;
 		usleep(sleepSeconds * 1000 * 1000);
-		globalMutex.lock();
 		for(Actor* actor : this->roomHandler->npcMap) {
 			actor->act(this);
 		}
-		globalMutex.unlock();
+		this->checkActorHealth();
+		this->checkPlayerHealth();
 	}
 }
 
-void Engine::checkHealth(Player* p, ClientHandler* ch) {
-	ch->canSend = false;
-	Room* prevRoom = p->currentRoom;
-	this->roomHandler->start()->addPlayer(p);
-	prevRoom->removePlayer(p);
-	ch->canSend = true;
-	ch->sendMessage(string("It is better to live for the emperor, than to die for yourself.\n"));
-	ch->sendMessage(this->parser->printIntro());
-	p->roomInfo(ch);
-	p->health = 100;
+void Engine::checkPlayerHealth() {
+	checkPlrMutex.lock();
+	this->players.shrink_to_fit();
+	for(Player* p : this->players) {
+		ClientHandler* ch = this->playerToClient[p];
+		if(p->health <= 0) {
+			ch->canSend = false;
+			Room* prevRoom = p->currentRoom;
+			this->roomHandler->start()->addPlayer(p);
+			prevRoom->removePlayer(p);
+			ch->canSend = true;
+			ch->sendMessage(string("\nYou have died.\nIt is better to live for the emperor, than to die for yourself.\n"));
+			ch->sendMessage(this->parser->printIntro());
+			p->roomInfo(ch);
+			p->health = 100;
+		}
+	}
+	checkPlrMutex.unlock();
+}
+
+void Engine::checkActorHealth() {
+	checkActMutex.lock();
+	vector<Actor*> toDelete;
+	for(Actor* actor : this->roomHandler->npcMap) {
+		if(actor->health <= 0) {
+			for(Player* p : actor->currentRoom->playersInRoom) {
+				ClientHandler* ch = this->playerToClient[p];
+				ch->sendMessage(string("\n" + actor->name + " has died.\n> "));
+			}
+			actor->die(this);
+			toDelete.push_back(actor);
+		}
+	}
+	for(Actor* actor : toDelete) {
+		delete actor;
+	}
+	this->roomHandler->npcMap.shrink_to_fit();
+	checkActMutex.unlock();
 }
 
 void Engine::addPlayer(ClientHandler* c, string name) {
@@ -94,22 +108,21 @@ void Engine::addPlayer(ClientHandler* c, string name) {
 	p->currentRoom = this->roomHandler->start();
 	this->roomHandler->start()->addPlayer(p);
 	if(p->askedForName == false) {
-		c->sendMessage(string("What is your name?\n> "));
+		c->sendMessage(string("\nWhat is your name?\n> "));
 		c->canSend = false;
 	}
 	this->clientToPlayer[c] = p;
 	this->playerToClient[p] = c;
+
+	this->players.push_back(p);
 }
 
 void Engine::parseInput(ClientHandler* ch, string str) {
 	globalMutex.lock();
 	Player* p = this->clientToPlayer[ch];
-	if(p->health <= 0) {
-		checkHealth(p, ch);
-		globalMutex.unlock();
-		return;
-	}
+	this->checkPlayerHealth();
 	parser->processCommand(p, ch, str);
+	this->checkActorHealth();
 	globalMutex.unlock();
 }
 

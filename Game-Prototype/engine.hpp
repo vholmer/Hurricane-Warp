@@ -11,12 +11,14 @@
 
 #include "parser.hpp"
 #include "player.hpp"
+#include "actor.hpp"
 #include "../Network-Prototype/clientHandler.hpp"
 
 struct Parser;
 struct Player;
 struct ClientHandler;
 struct RoomHandler;
+struct Actor;
 
 struct Engine {
 
@@ -26,6 +28,8 @@ struct Engine {
 	RoomHandler* roomHandler;
 
 	bool spin;
+
+	vector<Player*> players;
 
 	future<void> managerThread;
 	future<void> tickThread;
@@ -46,7 +50,9 @@ struct Engine {
 
 	void tickActors();
 
-	void checkHealth(Player* p, ClientHandler* ch);
+	void checkPlayerHealth();
+
+	void checkActorHealth();
 
 	void addPlayer(ClientHandler* c, string name = "");
 

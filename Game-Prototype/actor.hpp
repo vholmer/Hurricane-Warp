@@ -29,6 +29,8 @@ struct Actor {
 	int health;
 	int damageBase;
 
+	bool markedForDeath = false;
+
 	vector<Item*> inventory;
 
 	void setDamageBase(int damageBase); //in actor.cpp
@@ -37,15 +39,21 @@ struct Actor {
 
 	virtual void act(Engine* engine) = 0;
 
+	void die(Engine* engine);
+
 	void broadcast(Engine* engine, Room* prevRoom, bool leftRoom);
+
+	void broadcastPlayerDamage(Engine* engine, Player* p, int dmg);
+
+	void broadcastActorDamage(Engine* engine, Actor* actor, int dmg);
 
 	void walk(Engine* engine); //in actor.cpp
 
 	void printActor();
 
-	void fight(Actor* a); //in actor.cpp
+	int fight(Actor* a); //in actor.cpp
 
-	void fight(Player* p); //in actor.cpp
+	int fight(Player* p); //in actor.cpp
 
 	void pick_up(Item* a); //in actor.cpp
 
