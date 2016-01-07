@@ -65,15 +65,14 @@ void Engine::killConnections() {
 }
 
 void Engine::tickActors() {
-	int sleepSeconds = 60 * 1000 * 1000;
 	while(this->spin) {
-		usleep(sleepSeconds);
+		int sleepSeconds = (rand() % 7) + 6;
+		usleep(sleepSeconds * 1000 * 1000);
 		globalMutex.lock();
 		for(Actor* actor : this->roomHandler->npcMap) {
 			actor->act(this);
 		}
 		globalMutex.unlock();
-		sleepSeconds /= 2;
 	}
 }
 

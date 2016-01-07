@@ -82,6 +82,17 @@ void Player::addItem(Item* item) {
 	}
 }
 
+void Player::dropItem(Item* item) {
+	this->currentRoom->itemsInRoom.push_back(item);
+	for(auto i = this->inventory.begin(); i != this->inventory.end(); ++i) {
+		if(*i == item) {
+			this->inventory.erase(i);
+			this->inventory.shrink_to_fit();
+			return;
+		}
+	}
+}
+
 void Player::roomInfo(ClientHandler* ch) {
 	string printString = this->printRoomDescription();
 	printString += this->printActors();

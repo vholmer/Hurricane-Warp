@@ -47,6 +47,16 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 		}
 		ch->sendMessage(string("That item is not here.\n> "));
 	};
+
+	this->funcMap[cmd::DROP] = [this, p, ch] (string secondWord = "") {
+		for(Item* item : p->inventory) {
+			if(secondWord == toLowerCase(item->name)) {
+				p->dropItem(item);
+				ch->sendMessage(string("Dropped " + item->name + ".\n> "));
+			}
+		}
+		ch->sendMessage(string("You don't have that item.\n> "));
+	};
 }
 
 void Parser::setUpCommands() {
