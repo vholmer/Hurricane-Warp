@@ -43,6 +43,7 @@ RoomHandler::RoomHandler() {
 
 	clearing->addChar(wizard);
 
+	this->npcMap.push_back(wizard);
 	// ----- ACTOR INITIATIONS END -----
 }
 
