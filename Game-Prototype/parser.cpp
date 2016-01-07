@@ -133,10 +133,13 @@ void Parser::processCommand(Player* p, ClientHandler* ch, string str) {
 
 	if(p->askedForName == false) {
 		if(input.size() > 2) {
+			ch->canSend = true;
 			ch->sendMessage(string("Name too long!\n"));
+			ch->canSend = false;
 		}
 		p->name = str;
 		p->askedForName = true;
+		ch->canSend = true;
 		ch->sendMessage(this->printIntro());
 		p->roomInfo(ch);
 		return;

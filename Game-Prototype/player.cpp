@@ -31,7 +31,7 @@ string Player::printActors() {
 string Player::printPlayers() {
 	string retString;
 	for(Player* p : this->currentRoom->playersInRoom) {
-		if(p != this)
+		if((p != this) && (!strncmp(p->name, "", p->name.length())))
 			retString += p->name + " is here.\n";
 	}
 	return retString;

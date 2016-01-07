@@ -156,6 +156,7 @@ void ClientHandler::HandleInput(int socket) {
 ClientHandler::ClientHandler(Engine* engine) {
 	this->engine = engine;
 	this->objectDead = false;
+	this->canSend = true;
 }
 
 /*
@@ -238,14 +239,16 @@ void ClientHandler::sendSpawn() {
 } */
 
 void ClientHandler::sendMessage(std::string s) {
-	send_mutex.lock();
-	MessageStruct strc;
-	strc.textSize = s.size() + 1;
-	std::cout << "Gonna convert: " << s << std::endl;
-	SetContentCharArray(s, strc.text, strc.textSize);
-	std::cout << "Sending: " << strc.text << std::endl;
-	int n = SendMessageStruct(strc, socket.load());
-	send_mutex.unlock();
+	if(this->canSend) {
+		send_mutex.lock();
+		MessageStruct strc;
+		strc.textSize = s.size() + 1;
+		std::cout << "Gonna convert: " << s << std::endl;
+		SetContentCharArray(s, strc.text, strc.textSize);
+		std::cout << "Sending: " << strc.text << std::endl;
+		int n = SendMessageStruct(strc, socket.load());
+		send_mutex.unlock();
+	}
 }
 
 /*

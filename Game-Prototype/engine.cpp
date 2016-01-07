@@ -83,6 +83,7 @@ void Engine::addPlayer(ClientHandler* c, string name) {
 	this->roomHandler->start()->addPlayer(p);
 	if(p->askedForName == false) {
 		c->sendMessage(string("What is your name?\n> "));
+		c->canSend = false;
 	}
 	this->clientToPlayer[c] = p;
 	this->playerToClient[p] = c;

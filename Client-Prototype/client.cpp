@@ -206,7 +206,8 @@ bool Client::start(int argc, char* argv[]) {
 	//std::cout << "starting client" << std::endl;
 	if (argc < 3) {
        fprintf(stderr,"usage %s hostname port\n", argv[0]);
-       exit(0);
+       //exit(0);
+       return false;
     }
 
     this->portno = atoi(argv[2]); // Connec
@@ -220,7 +221,8 @@ bool Client::start(int argc, char* argv[]) {
     
     if (server == NULL) {
         fprintf(stderr,"ERROR, no such host\n");
-        exit(0);
+        //exit(0);
+        return false;
     }
 
     bzero((char *) &serv_addr, sizeof(serv_addr)); // set everything to zero

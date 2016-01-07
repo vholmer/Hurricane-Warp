@@ -68,6 +68,7 @@ class ClientHandler {
 	public:
 
 		bool objectDead;
+		bool canSend;
 
 		//queue<string> input; // queue which holds all the input 
 		//queue<string> output; // queue which holds all the ouput
