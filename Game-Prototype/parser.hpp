@@ -51,7 +51,7 @@ struct Parser {
 
 	string printIntro();
 
-	void broadcastFromPlayer(Player* p, Room* prevRoom);
+	void broadcastMovement(Player* p, Room* prevRoom);
 
 	void processCommand(Player* p, ClientHandler* ch, string str);
 };

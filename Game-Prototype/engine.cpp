@@ -10,6 +10,8 @@ Engine::Engine() {
 	this->roomHandler = new RoomHandler();
 	this->spin = true;
 	this->managerThread = async(std::launch::async, &Engine::clientManager, this);
+	this->tickThread = async(std::launch::async, &Engine::tickActors, this);
+
 }
 
 void Engine::clientManager() {
@@ -29,7 +31,7 @@ void Engine::clientManager() {
 void Engine::deleteClient(Player* p, ClientHandler* ch) {
 	deleteMutex.lock();
 	p->currentRoom->removePlayer(p);
-	cout << "NAME DELETED: " << p->name << endl;
+	cout << "PLAYER DELETED: " << p->name << endl;
 	delete ch;
 	delete p;
 	deleteMutex.unlock();
@@ -38,6 +40,7 @@ void Engine::deleteClient(Player* p, ClientHandler* ch) {
 void Engine::memHandle() {
 	this->spin = false;
 	this->managerThread.wait();
+	this->tickThread.wait();
 	delete this->parser;
 	for(pair<Player*, ClientHandler*> p : this->playerToClient) {
 		delete p.first;
@@ -62,13 +65,17 @@ void Engine::killConnections() {
 }
 
 void Engine::tickActors() {
-	globalMutex.lock();
-	for(Room* room : this->roomHandler->gameMap) {
-		for(Actor* actor : room->charsInRoom) {
-			actor->act();
+	int sleepSeconds = 4;
+	while(this->spin) {
+		usleep(sleepSeconds * 1000 * 1000);
+		globalMutex.lock();
+		for(Room* room : this->roomHandler->gameMap) {
+			for(Actor* actor : room->charsInRoom) {
+				actor->act(this);
+			}
 		}
+		globalMutex.unlock();
 	}
-	globalMutex.unlock();
 }
 
 void Engine::addPlayer(ClientHandler* c, string name) {

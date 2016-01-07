@@ -4,7 +4,19 @@ void Actor::setDamageBase(int damageBase) {
 	this->damageBase = damageBase;
 }
 
-void Actor::walk() {
+void Actor::broadcast(Engine* engine, Room* room, bool leftRoom) {
+	for(Player* p : room->playersInRoom) {
+		ClientHandler* ch = engine->playerToClient[p];
+		if(leftRoom)
+			ch->sendMessage(string(this->name + " has left the room.\n> "));
+		else
+			ch->sendMessage(string(this->name + " has entered the room.\n> "));
+	}
+}
+
+void Actor::walk(Engine* engine) {
+	broadcast(engine, this->currentRoom, true);
+	
 	auto possibleDirs = this->currentRoom->getExits();
 
 	int diceRoll = rand() % possibleDirs.size();
@@ -22,6 +34,8 @@ void Actor::walk() {
 	if(this->playerInRoom() != 0) {
 		this->printActor();
 	}
+
+	broadcast(engine, this->currentRoom, false);
 }
 
 void Actor::printActor() {

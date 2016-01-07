@@ -28,6 +28,7 @@ struct Engine {
 	bool spin;
 
 	future<void> managerThread;
+	future<void> tickThread;
 
 	Engine();
 

@@ -7,11 +7,15 @@
 #include "room.hpp"
 #include "player.hpp"
 #include "item.hpp"
+#include "engine.hpp"
+#include "../Network-Prototype/clientHandler.hpp"
 
 using namespace std;
 
 struct Room;
 struct Player;
+struct Engine;
+struct ClientHandler;
 
 struct Actor {
 
@@ -31,9 +35,11 @@ struct Actor {
 
 	virtual ~Actor() = default;
 
-	virtual void act() = 0;
+	virtual void act(Engine* engine) = 0;
 
-	void walk(); //in actor.cpp
+	void broadcast(Engine* engine, Room* prevRoom, bool leftRoom);
+
+	void walk(Engine* engine); //in actor.cpp
 
 	void printActor();
 

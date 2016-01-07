@@ -12,8 +12,8 @@ Wizard::Wizard(string name, string description) {
 }
 
 // Next level AI right here
-void Wizard::act() {
-	this->mana += 1;
+void Wizard::act(Engine* engine) {
+	/*this->mana += 1;
 	if(this->health <= 0) {
 		this->currentRoom->removeChar(this);
 		delete this;
@@ -30,8 +30,8 @@ void Wizard::act() {
 	} else if(this->playerInRoom() != 0) {
 		this->fight(this->playerInRoom());
 		return;
-	}
-	this->walk();
+	}*/
+	this->walk(engine);
 }
 
 void Wizard::enchant(Actor* a) {
