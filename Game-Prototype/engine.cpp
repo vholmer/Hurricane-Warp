@@ -101,6 +101,7 @@ void Engine::parseInput(ClientHandler* ch, string str) {
 		ch->sendMessage(string("It is better to live for the emperor, than to die for yourself.\n"));
 		ch->sendMessage(this->parser->printIntro());
 		p->roomInfo(ch);
+		p->health = 100;
 	}
 	parser->processCommand(p, ch, str);
 	globalMutex.unlock();
