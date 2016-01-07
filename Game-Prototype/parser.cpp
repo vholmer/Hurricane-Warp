@@ -18,7 +18,7 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 				nextRoom->addPlayer(p);
 				prevRoom->removePlayer(p);
 				p->roomInfo(ch);
-				this->broadcastFromPlayer(p);
+				this->broadcastFromPlayer(p, prevRoom);
 			}
 		} else {
 			ch->sendMessage(string("You can't go there.\n> "));
@@ -89,12 +89,16 @@ string Parser::printIntro() {
 	return retString;
 }
 
-void Parser::broadcastFromPlayer(Player* p) {
+void Parser::broadcastFromPlayer(Player* p, Room* prevRoom) {
 	for(Player* otherInRoom : p->currentRoom->playersInRoom) {
 		if(otherInRoom != p) {
 			ClientHandler* ch = this->engine->playerToClient[otherInRoom];
 			ch->sendMessage(string("\n" + p->name + " has entered the room.\n> "));
 		}
+	}
+	for(Player* otherInRoom : prevRoom->playersInRoom) {
+		ClientHandler* ch = this->engine->playerToClient[otherInRoom];
+		ch->sendMessage(string("\n" + p->name + " has left the room.\n> "));
 	}
 }
 

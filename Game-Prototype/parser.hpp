@@ -12,6 +12,7 @@
 
 #include "player.hpp"
 #include "engine.hpp"
+#include "room.hpp"
 #include "../Network-Prototype/clientHandler.hpp"
 
 using namespace std;
@@ -19,6 +20,7 @@ using namespace std;
 struct Player;
 struct ClientHandler;
 struct Engine;
+struct Room;
 
 struct Parser {
 
@@ -49,7 +51,7 @@ struct Parser {
 
 	string printIntro();
 
-	void broadcastFromPlayer(Player* p);
+	void broadcastFromPlayer(Player* p, Room* prevRoom);
 
 	void processCommand(Player* p, ClientHandler* ch, string str);
 };
