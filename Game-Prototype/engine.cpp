@@ -41,7 +41,7 @@ string Engine::printIntro() {
 	string retString;
 	retString += "\nYou have crashed on a mysterious planet!\n";
 	retString += "In the name of the Emperor, good luck.\n";
-	retString += "What do you do?\n";
+	retString += "What do you do?\n\n";
 	return retString;
 }
 
@@ -59,18 +59,18 @@ void Engine::addPlayer(ClientHandler* c, string name) {
 	Player* p = new Player();
 	p->name = name;
 	p->currentRoom = this->roomHandler->start();
+	this->roomHandler->start()->addPlayer(p);
 	c->sendMessage(this->printIntro());
 	p->roomInfo(c);
 	this->clientToPlayer[c] = p;
 	this->playerToClient[p] = c;
 }
 
-bool Engine::parseInput(ClientHandler* ch, string str) {
+void Engine::parseInput(ClientHandler* ch, string str) {
 	globalMutex.lock();
 	Player* p = this->clientToPlayer[ch];
-	bool retBool = parser->processCommand(p, ch, str);
+	parser->processCommand(p, ch, str);
 	globalMutex.unlock();
-	return retBool;
 }
 
 /*void Engine::startGameLoop() {

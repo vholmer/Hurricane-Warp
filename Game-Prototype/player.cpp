@@ -30,8 +30,11 @@ string Player::printActors() {
 string Player::printPlayers() {
 	string retString;
 	for(Player* p : this->currentRoom->playersInRoom) {
-		retString += p->name + " is here. ";
+		if(p != this)
+			retString += p->name + " is here.\n";
 	}
+	if(retString.length() > 2)
+		retString += "\n";
 	return retString;
 }
 
@@ -52,8 +55,7 @@ string Player::printExits() {
 	for(string s : this->currentRoom->getExits()) {
 		retString += s + " ";
 	}
-	if(retString.length() > 2)
-		retString += "\n";
+	retString += "\n> ";
 	return retString;
 }
 

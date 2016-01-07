@@ -24,13 +24,12 @@ struct Parser {
 		GO = 1,
 		LOOK,
 		HELP,
-		QUIT,
 		INVENTORY
 	};
 
 	Player* player;
 
-	map<cmd, std::function<bool(string)> > funcMap;
+	map<cmd, std::function<void(string)> > funcMap;
 
 	unordered_map<string, cmd> commands;
 
@@ -44,7 +43,7 @@ struct Parser {
 
 	string toLowerCase(string str);
 
-	bool processCommand(Player* p, ClientHandler* ch, string str);
+	void processCommand(Player* p, ClientHandler* ch, string str);
 };
 
 #endif

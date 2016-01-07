@@ -36,7 +36,7 @@ struct Engine {
 
 	void addPlayer(ClientHandler* c, string name);
 
-	bool parseInput(ClientHandler* ch, string str);
+	void parseInput(ClientHandler* ch, string str);
 
 	//void startGameLoop();
 };

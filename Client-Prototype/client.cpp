@@ -84,7 +84,8 @@ void Client::HandleInput(int socket) {
 		}
 	}
 	if(strc != NULL) {
-		std::cout << strc->text << std::endl;
+		std::cout << strc->text;
+		std::cout.flush();
 	}
 	delete strc;
 }
@@ -163,7 +164,6 @@ void Client::client_process(int socket) {
 			close(socket);
 			break;
 		}
-
 		struct timeval tv;
 	    fd_set fds;
 	    tv.tv_sec = 3; // Set time out to 3 sec
@@ -177,8 +177,8 @@ void Client::client_process(int socket) {
 	    	getline(cin, s);
 	    	std::cout << "\n";
 
-	    	if(s == "Exit") {
-	    		std::cout << "We are exiting" << std::endl;
+	    	if(s == "quit") {
+	    		std::cout << "Life is the Emperor's currency, spend it wisely." << std::endl;
 	    		this->quitConnection(socket);
 	    	}
 	    	else {
