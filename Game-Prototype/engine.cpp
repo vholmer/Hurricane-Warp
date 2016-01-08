@@ -150,7 +150,7 @@ void Engine::checkPlayerHealth() {
 			ch->sendMessage(string("\nYou have died.\nIt is better to die for the emperor, than to live for yourself.\n"));
 			ch->sendMessage(this->parser->printIntro());
 			p->roomInfo(ch);
-			p->health = 100;
+			p->health = p->maxHealth;
 		}
 	}
 	checkMutex.unlock();
