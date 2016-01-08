@@ -28,7 +28,7 @@ void Actor::broadcast(Engine* engine, Room* room, bool leftRoom) {
 
 void Actor::broadcastPlayerDamage(Engine* engine, Player* p, int dmg) {
 	for(Player* other : this->currentRoom->playersInRoom) {
-		ClientHandler* ch = engine->playerToClient[p];
+		ClientHandler* ch = engine->playerToClient[other];
 		if(other != p)
 			ch->sendMessage(string("\n" + p->name + " was hit by " + this->name + " for " + to_string(dmg) + " damage.\n> "));
 		else
