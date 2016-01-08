@@ -76,6 +76,8 @@ RoomHandler::RoomHandler() {
 	church->exits[SOUTH] = village;
 	church->exits[NORTH] = warp;
 
+	warp->exits[SOUTH] = church;
+
 	this->gameMap.push_back(startRoom);
 	this->gameMap.push_back(cliff);
 	this->gameMap.push_back(cross);
