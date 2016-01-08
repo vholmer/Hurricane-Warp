@@ -8,6 +8,7 @@
 #include "item.hpp"
 #include "roomhandler.hpp"
 #include "actor.hpp"
+#include "engine.hpp"
 #include "../Network-Prototype/clientHandler.hpp"
 
 using namespace std;
@@ -15,6 +16,7 @@ using namespace std;
 struct Room;
 struct ClientHandler;
 struct Actor;
+struct Engine;
 
 struct Player {
 	string name;
@@ -30,6 +32,8 @@ struct Player {
 	Room* getRoomInDir(string dir);
 
 	unordered_map<string, Room*> getExitMap();
+
+	void broadcastDeath(Engine* engine);
 
 	string printRoomDescription();
 

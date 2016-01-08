@@ -14,6 +14,15 @@ unordered_map<string, Room*> Player::getExitMap() {
 	return this->currentRoom->exits;
 }
 
+void Player::broadcastDeath(Engine* engine) {
+	for(Player* other : this->currentRoom->playersInRoom) {
+		if(other != this) {
+			ClientHandler* ch = engine->playerToClient[other];
+			ch->sendMessage(string("\n" + this->name + " has died.\n> "));
+		}
+	}
+}
+
 string Player::printRoomDescription() {
 	string retString;
 	retString += this->currentRoom->description + "\n";

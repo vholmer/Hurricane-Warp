@@ -20,6 +20,9 @@ void Engine::memHandle() {
 	delete this->parser;
 
 	for(pair<Player*, ClientHandler*> p : this->playerToClient) {
+		for(Item* item : p.first->inventory) {
+			delete item;
+		}
 		delete p.first;
 		delete p.second;
 
@@ -84,6 +87,7 @@ void Engine::checkPlayerHealth() {
 			this->roomHandler->start()->addPlayer(p);
 			prevRoom->removePlayer(p);
 			ch->canSend = true;
+			p->broadcastDeath(this);
 			ch->sendMessage(string("\nYou have died.\nIt is better to live for the emperor, than to die for yourself.\n"));
 			ch->sendMessage(this->parser->printIntro());
 			p->roomInfo(ch);
