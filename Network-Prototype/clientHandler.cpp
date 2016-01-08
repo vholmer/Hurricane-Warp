@@ -121,12 +121,11 @@ void ClientHandler::HandleInput(int socket) {
 			break;
 		}
 		case MessageCode::ConnectionLost : {
+			this->objectDead = true;
+			this->canSend = false;
 			std::cout << "End connection" << std::endl;
 			std::cout << "We are done here" << std::endl;
-			int i = (int) MessageCode::ConnectionLost;
-			SendInt(i, socket);
-			this->quitConnection();
-			this->objectDead = true;
+			this->endConnection();
 			break;
 			}
 		case MessageCode::MessageMessage : {
@@ -189,22 +188,39 @@ void ClientHandler::endConnection() {
 }
 
 void ClientHandler::quitConnection() {
-	std::cout << "End connection" << std::endl;
+	send_mutex.lock();
+	fd_set set;
+    struct timeval timeout;
+	std::cout << "Ending connection" << std::endl;
 	if(kill_everythread.load()) {
-		//out_thr.wait();
 		in_thr.wait();
 		return;
 	}
+	std::cout << "Ask threads to kill themselves" << std::endl;
+	kill_everythread = true;
+	in_thr.wait();
+	std::cout << "Done waiting" << std::endl;
 	int end = (int) MessageCode::ConnectionLost;
 	SendInt(end, this->socket.load());
-
 	int done = (int) MessageCode::ConnectionLost;
+	std::cout << "Ask client to disconnect" << std::endl;
 	int ret = 0;
-	do {
+	FD_ZERO(&set); /* clear the set */
+	FD_SET(socket, &set); /* add our file descriptor to the set */
+	timeout.tv_sec = 1; // set time out time  to 2 sec
+	timeout.tv_usec = 0; // set return signal
+		
+	ret = select(socket + 1, &set, NULL, NULL, &timeout);
+	if(ret != 0) {
 		ReadInt(&ret, this->socket);
-	} while(ret != done);
+	} else {
+		std::cout << "TIMEOUT" << std::endl;
+	
+	}
+	close(this->socket.load()); // close socket
+	std::cout << "TRÅDEN ÄR HELT KLAR" << std::endl;
+	send_mutex.unlock();
 
-	this->endConnection();
 }
 
 /*
@@ -239,16 +255,16 @@ void ClientHandler::sendSpawn() {
 } */
 
 void ClientHandler::sendMessage(std::string s) {
-	if(this->canSend) {
-		send_mutex.lock();
-		MessageStruct strc;
-		strc.textSize = s.size() + 1;
-		std::cout << "Gonna convert: " << s << std::endl;
-		SetContentCharArray(s, strc.text, strc.textSize);
-		std::cout << "Sending: " << strc.text << std::endl;
-		int n = SendMessageStruct(strc, socket.load());
-		send_mutex.unlock();
-	}
+	if(!this->canSend) return;
+	std::cout << "Is allowed to print" << std::endl;
+	send_mutex.lock();
+	MessageStruct strc;
+	strc.textSize = s.size() + 1;
+	std::cout << "Gonna convert: " << s << std::endl;
+	SetContentCharArray(s, strc.text, strc.textSize);
+	std::cout << "Sending: " << strc.text << std::endl;
+	int n = SendMessageStruct(strc, socket.load());
+	send_mutex.unlock();
 }
 
 /*

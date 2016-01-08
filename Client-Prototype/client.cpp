@@ -33,12 +33,9 @@ void Client::read_process(int socket) {
 
    		if(ret != 0) {
 		   	HandleInput(socket);
-   		} 
-   		
+   		} 	
 	}
-
 }
-
 
 void Client::HandleInput(int socket) {
 	int n;
@@ -68,14 +65,9 @@ void Client::HandleInput(int socket) {
 			break;
 			}
 		case MessageCode::ConnectionLost : {
-			////std::cout << "Damn" << std::endl;
-			////std::cout << "Server is down" << std::endl;
-			n = SendInt((int)MessageCode::ConnectionLost, socket);
-			
-			if(n < 0) {
-				///std::cout << "Something has gone completely wrong" << std::endl;
-				return;
-			}
+			std::cout << "Damn" << std::endl;
+			std::cout << "Server is down" << std::endl;
+			SendInt((int)MessageCode::ConnectionLost, socket);
 			endConnection(socket);
 			break;
 			}
@@ -102,16 +94,8 @@ void Client::quitConnection(int socket) {
 	////std::cout << "Send quit request to server" << std::endl;
 	int end = (int) MessageCode::ConnectionLost;
 	SendInt(end, socket);
-
-	////std::cout << "Waiting for response" << std::endl;
-	int done = (int) MessageCode::ConnectionLost;
-	int ret = 0;
-	do {
-		ReadInt(&ret, socket);
-	} while(ret != done);
-	SendInt(end, socket);
+	endConnection(socket);
 	////std::cout << "Kill the thread" << std::endl;
-
 }
 
 
@@ -160,7 +144,7 @@ void Client::send(int socket, string s) {
 void Client::client_process(int socket) {
 	while(1) {
 		if(this->kill_everythread.load()) {
-			//std::cout << "We are closing our connection" << std::endl;
+			std::cout << "We are closing our connection" << std::endl;
 			close(socket);
 			break;
 		}
@@ -214,8 +198,11 @@ bool Client::start(int argc, char* argv[]) {
     this->sockfd = socket(AF_INET, SOCK_STREAM, 0); 
     sock = sockfd;
 
-    if (this->sockfd < 0) 
-        error("ERROR opening socket");
+    if (this->sockfd < 0) {
+    	std::cout << "ERROR opening socket" << std::endl;
+    	return false;
+        //error("ERROR opening socket");
+    }
 
     this->server = gethostbyname(argv[1]); // Get a host by IP adress
     
@@ -234,8 +221,11 @@ bool Client::start(int argc, char* argv[]) {
 
     serv_addr.sin_port = htons(portno);
 
-    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
-        error("ERROR connecting");
+    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
+        //error("ERROR connecting");
+        std::cout << "ERROR opening socket" << std::endl;
+    	return false;
+    }
 
     auto test = async(std::launch::async, &Client::client_process, this, this->sockfd);
     auto test2 = async(std::launch::async, &Client::read_process, this, this->sockfd);

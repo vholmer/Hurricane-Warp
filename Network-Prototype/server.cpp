@@ -86,7 +86,7 @@ bool Server::stop() {
 	std::cout << "Close socket" << std::endl;
 	close(this->sockfd); // close socket
 	//this->list_mutex.lock(); // lock the list
-	std::cout << "locking list" << std::endl;
+	std::cout << "killing" << std::endl;
 	engine->killConnections();
 	//engine->memHandle();
 	/*for(ClientHandler* c: client_list) {
