@@ -16,45 +16,8 @@ void Actor::die(Engine* engine) {
 	}
 }
 
-void Actor::globalBroadcast(Engine* engine, string message) {
-	for(Player* p : engine->players) {
-		ClientHandler* ch = engine->playerToClient[p];
-		ch->sendMessage(string("\n" + message));
-	}
-}
-
-void Actor::broadcast(Engine* engine, Room* room, bool leftRoom) {
-	for(Player* p : room->playersInRoom) {
-		ClientHandler* ch = engine->playerToClient[p];
-		if(leftRoom)
-			ch->sendMessage(string("\n" + this->name
-				+ " has left the room.\n> "));
-		else
-			ch->sendMessage(string("\n" + this->name
-				+ " has entered the room.\n> "));
-	}
-}
-
-void Actor::broadcastPlayerDamage(Engine* engine, Player* p, int dmg) {
-	for(Player* other : this->currentRoom->playersInRoom) {
-		ClientHandler* ch = engine->playerToClient[other];
-		if(other != p)
-			ch->sendMessage(string("\n" + p->name
-				+ " was hit by " + this->name
-				+ " for " + to_string(dmg) + " damage.\n> "));
-		else
-			ch->sendMessage(string("\nYou were hit by "
-				+ this->name + " for "
-				+ to_string(dmg) + " damage."
-				+ " (" + to_string(p->health)
-				+ "/" + to_string(p->maxHealth)
-				+ ")HP"
-				+ "\n> "));
-	}
-}
-
 void Actor::walk(Engine* engine) {
-	broadcast(engine, this->currentRoom, true);
+	engine->broadcast(this, this->currentRoom, true);
 
 	auto possibleDirs = this->currentRoom->getExits();
 
@@ -74,7 +37,7 @@ void Actor::walk(Engine* engine) {
 		this->printActor();
 	}
 
-	broadcast(engine, this->currentRoom, false);
+	engine->broadcast(this, this->currentRoom, false);
 }
 
 void Actor::printActor() {
@@ -89,20 +52,38 @@ int Actor::fight(Actor* a) {
 
 int Actor::fight(Player* p) {
 	int damage = rand() % this->damageBase + 1;
-	p->health -= damage;
+	p->takeDamage(damage);
 	return damage;
 }
 
-void Actor::talk() {
-	if(this->playerInRoom() != 0) {
-		cout << this->dialogue << endl;
-	}
-}
-
 Player* Actor::playerInRoom() {
-	if(this->currentRoom->playersInRoom.size() > 0) {
-		int randPlayer = rand() % this->currentRoom->playersInRoom.size();
-		return this->currentRoom->playersInRoom[randPlayer];
+	if(this->currentRoom->getPlayersInRoom().size() > 0) {
+		int randPlayer = rand() % this->currentRoom->getPlayersInRoom().size();
+		return this->currentRoom->getPlayersInRoom()[randPlayer];
 	}
 	return (Player*) 0;
+}
+
+Room* Actor::getRoom() {
+	return this->currentRoom;
+}
+
+void Actor::setRoom(Room* newRoom) {
+	this->currentRoom = newRoom;
+}
+
+string Actor::getName() const {
+	return this->name;
+}
+
+string Actor::getDescription() const {
+	return this->description;
+}
+
+void Actor::takeDamage(int toSubtract) {
+	this->health -= toSubtract;
+}
+
+int Actor::getHealth() const {
+	return this->health;
 }

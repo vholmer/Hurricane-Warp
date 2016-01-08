@@ -24,6 +24,8 @@ struct Room;
 
 struct Parser {
 
+private:
+
 	enum class cmd : int {
 		GO = 1,
 		LOOK,
@@ -41,7 +43,15 @@ struct Parser {
 
 	Engine* engine;
 
+public:
+
 	Parser(Engine* engine);
+
+	string getIntro() const;
+
+	void processCommand(Player* p, ClientHandler* ch, string str);
+
+private:
 
 	void setUpLambdas(Player* p, ClientHandler* ch);
 
@@ -51,13 +61,7 @@ struct Parser {
 
 	string toLowerCase(string str);
 
-	string printIntro();
-
 	void broadcastMovement(Player* p, Room* prevRoom);
-
-	void broadcastItem(Player* p, string itemName, bool pickedUp);
-
-	void processCommand(Player* p, ClientHandler* ch, string str);
 };
 
 #endif

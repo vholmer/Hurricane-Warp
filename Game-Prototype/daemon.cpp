@@ -4,8 +4,6 @@ Daemon::Daemon(string name, string description) {
 	this->name = name;
 	this->description = description;
 
-	this->dialogue = "The Chaos gods are thirsty...your blood will do!";
-
 	this->health = 150;
 	this->setDamageBase(4);
 }
@@ -19,7 +17,7 @@ void Daemon::act(Engine* engine) {
 	}
 	if(randomPlayer != 0) {
 		int damage = this->fight(randomPlayer);
-		this->broadcastPlayerDamage(engine, randomPlayer, damage);
+		engine->broadcastPlayerDamage(this, randomPlayer, damage);
 		return;
 	}
 	this->walk(engine);

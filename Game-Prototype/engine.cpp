@@ -15,6 +15,55 @@ Engine::Engine() {
 
 }
 
+void Engine::globalBroadcast(string message) {
+	for(Player* p : this->players) {
+		ClientHandler* ch = this->playerToClient[p];
+		ch->sendMessage(string("\n" + message));
+	}
+}
+
+void Engine::broadcast(Actor* fromActor, Room* room, bool leftRoom) {
+	for(Player* p : room->getPlayersInRoom()) {
+		ClientHandler* ch = this->playerToClient[p];
+		if(leftRoom)
+			ch->sendMessage(string("\n" + fromActor->getName()
+				+ " has left the room.\n> "));
+		else
+			ch->sendMessage(string("\n" + fromActor->getName()
+				+ " has entered the room.\n> "));
+	}
+}
+
+void Engine::broadcastItem(Player* p, string itemName, bool pickedUp) {
+	for(Player* otherInRoom : p->getRoom()->getPlayersInRoom()) {
+		if(otherInRoom != p) {
+			ClientHandler* ch = this->playerToClient[otherInRoom];
+			if(pickedUp)
+				ch->sendMessage(string("\n" + p->getName() + " took " + itemName + "\n> "));
+			else
+				ch->sendMessage(string("\n" + p->getName() + " dropped " + itemName + "\n> "));
+		}
+	}
+}
+
+void Engine::broadcastPlayerDamage(Actor* fromActor, Player* p, int dmg) {
+	for(Player* other : fromActor->getRoom()->getPlayersInRoom()) {
+		ClientHandler* ch = this->playerToClient[other];
+		if(other != p)
+			ch->sendMessage(string("\n" + p->getName()
+				+ " was hit by " + fromActor->getName()
+				+ " for " + to_string(dmg) + " damage.\n> "));
+		else
+			ch->sendMessage(string("\nYou were hit by "
+				+ fromActor->getName() + " for "
+				+ to_string(dmg) + " damage."
+				+ " (" + to_string(p->getHealth())
+				+ "/" + to_string(p->getMaxHealth())
+				+ ")HP"
+				+ "\n> "));
+	}
+}
+
 void Engine::clientManager() {
 	while(this->spin) {
 		disconMutex.lock();
@@ -24,10 +73,10 @@ void Engine::clientManager() {
 			globalMutex.lock();
 			Player* p = this->clientToPlayer[ch];
 			p->dropAllItems(this);
-			for(Item* item : p->inventory) {
+			for(Item* item : p->getInventory()) {
 				delete item;
 			}
-			p->currentRoom->removePlayer(p);
+			p->getRoom()->removePlayer(p);
 			auto begiP = this->players.begin();
 			auto endP  = this->players.end();
 			for(auto i = begiP; i != endP; ++i) {
@@ -71,7 +120,7 @@ void Engine::memHandle() {
 	delete this->parser;
 
 	for(pair<Player*, ClientHandler*> p : this->playerToClient) {
-		for(Item* item : p.first->inventory) {
+		for(Item* item : p.first->getInventory()) {
 			delete item;
 		}
 		delete p.first;
@@ -80,11 +129,11 @@ void Engine::memHandle() {
 	}
 	for(Room* room : this->roomHandler->gameMap) {
 
-		for(Item* item : room->itemsInRoom) {
+		for(Item* item : room->getItemsInRoom()) {
 			delete item;
 		}
 
-		for(Actor* actor : room->charsInRoom) {
+		for(Actor* actor : room->getCharsInRoom()) {
 			delete actor;
 		}
 
@@ -121,7 +170,7 @@ void Engine::tickActors() {
 		string daemon = "Daemon";
 		bool daemonAlive= false;
 		for(Actor* actor : this->roomHandler->npcMap) {
-			if(actor->name == daemon)
+			if(actor->getName() == daemon)
 				daemonAlive = true;
 		}
 		if(!daemonAlive) {
@@ -141,16 +190,16 @@ void Engine::checkPlayerHealth() {
 	this->players.shrink_to_fit();
 	for(Player* p : this->players) {
 		ClientHandler* ch = this->playerToClient[p];
-		if(p->health <= 0) {
-			Room* prevRoom = p->currentRoom;
+		if(p->getHealth() <= 0) {
+			Room* prevRoom = p->getRoom();
 			p->dropAllItems(this);
 			p->broadcastDeath(this);
 			this->roomHandler->start()->addPlayer(p);
 			prevRoom->removePlayer(p);
 			ch->sendMessage(string("\nYou have died.\nIt is better to die for the emperor, than to live for yourself.\n"));
-			ch->sendMessage(this->parser->printIntro());
+			ch->sendMessage(this->parser->getIntro());
 			p->roomInfo(ch);
-			p->health = p->maxHealth;
+			p->setHealth(p->getMaxHealth());
 		}
 	}
 	checkMutex.unlock();
@@ -161,10 +210,10 @@ void Engine::checkActorHealth() {
 	vector<Actor*> toDelete;
 	for(int i = 0; i < this->roomHandler->npcMap.size(); ++i) {
 		Actor* actor = this->roomHandler->npcMap[i];
-		if(actor->health <= 0) {
-			for(Player* p : actor->currentRoom->playersInRoom) {
+		if(actor->getHealth() <= 0) {
+			for(Player* p : actor->getRoom()->getPlayersInRoom()) {
 				ClientHandler* ch = this->playerToClient[p];
-				ch->sendMessage(string("\n" + actor->name + " has died.\n> "));
+				ch->sendMessage(string("\n" + actor->getName() + " has died.\n> "));
 			}
 			actor->die(this);
 			delete actor;
@@ -177,10 +226,10 @@ void Engine::checkActorHealth() {
 
 void Engine::addPlayer(ClientHandler* c, string name) {
 	Player* p = new Player();
-	p->name = name;
-	p->currentRoom = this->roomHandler->start();
+	p->setName(name);
+	p->setRoom(this->roomHandler->start());
 	this->roomHandler->start()->addPlayer(p);
-	if(p->askedForName == false) {
+	if(p->askedName() == false) {
 		c->sendMessage(string("\n")
 			+ string("Welcome to Hurricane Warp. Type help if you get stuck!\n")
 			+ string("What is your name?\n> "));

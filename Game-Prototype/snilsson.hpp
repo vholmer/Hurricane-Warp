@@ -11,9 +11,10 @@ struct Snilsson : public Actor {
 
 	virtual void act(Engine* engine) override;
 
-	Player* weakestPlayer();
-
 	virtual void die(Engine* engine) override;
+
+private:
+	Player* weakestPlayer();
 };
 
 #endif

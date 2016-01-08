@@ -1,5 +1,53 @@
 #include "player.hpp"
 
+string Player::getName() const {
+	return this->name;
+}
+
+void Player::setName(string newName) {
+	this->name = newName;
+}
+
+Room* Player::getRoom() {
+	return this->currentRoom;
+}
+
+void Player::setRoom(Room* newRoom) {
+	this->currentRoom = newRoom;
+}
+
+vector<Item*>& Player::getInventory() {
+	return this->inventory;
+}
+
+int Player::getHealth() const {
+	return this->health;
+}
+
+void Player::setHealth(int health) {
+	this->health = health;
+}
+
+void Player::takeDamage(int toSubtract) {
+	this->health -= toSubtract;
+}
+
+int Player::getMaxHealth() const {
+	return this->maxHealth;
+}
+
+int Player::getDamageBase() const {
+	return this->damageBase;
+}
+
+bool Player::askedName() const {
+	return this->askedForName;
+}
+
+void Player::setAskedName(bool askedForName) {
+	this->askedForName = askedForName;
+}
+
 Player::Player() {
 	this->maxHealth = 20;
 	this->health = 20;
@@ -16,7 +64,7 @@ unordered_map<string, Room*> Player::getExitMap() {
 }
 
 void Player::broadcastDeath(Engine* engine) {
-	for(Player* other : this->currentRoom->playersInRoom) {
+	for(Player* other : this->currentRoom->getPlayersInRoom()) {
 		if(other != this) {
 			ClientHandler* ch = engine->playerToClient[other];
 			ch->sendMessage(string("\n" + this->name + " has died.\n> "));
@@ -26,22 +74,22 @@ void Player::broadcastDeath(Engine* engine) {
 
 string Player::printRoomDescription() {
 	string retString;
-	retString += this->currentRoom->description + "\n";
+	retString += this->currentRoom->getDescription() + "\n";
 	return retString;
 }
 
 string Player::printActors() {
 	string retString;
-	for(Actor* actor : this->currentRoom->charsInRoom) {
-		retString += actor->name + " is here. ";
-		retString += actor->description + "\n";
+	for(Actor* actor : this->currentRoom->getCharsInRoom()) {
+		retString += actor->getName() + " is here. ";
+		retString += actor->getDescription() + "\n";
 	}
 	return retString;
 }
 
 string Player::printPlayers() {
 	string retString;
-	for(Player* p : this->currentRoom->playersInRoom) {
+	for(Player* p : this->currentRoom->getPlayersInRoom()) {
 		if((p != this) && (p->name != ""))
 			retString += p->name + " is here.\n";
 	}
@@ -51,9 +99,9 @@ string Player::printPlayers() {
 string Player::printItems() {
 	string retString;
 	retString += "Items in room: ";
-	for(Item* item : this->currentRoom->itemsInRoom) {
+	for(Item* item : this->currentRoom->getItemsInRoom()) {
 		if(item != 0)
-			retString += item->name + " ";
+			retString += item->getName() + " ";
 	}
 	retString += "\n";
 	if(retString == "Items in room: \n")
@@ -71,11 +119,11 @@ string Player::printExits() {
 	return retString;
 }
 
-string Player::printInventory() {
+string Player::getInventoryString() {
 	string retString;
 	retString = "Inventory:\n";
 	for(Item* item : this->inventory) {
-		retString += item->name + " ";
+		retString += item->getName() + " ";
 	}
 	if(retString.length() == 0) {
 		retString = "You have nothing!";
@@ -92,25 +140,25 @@ int Player::fightPlayer(Player* p) {
 
 int Player::fightActor(Actor* a) {
 	int damage = rand() % this->damageBase + this->getDamage();
-	a->health -= damage;
+	a->takeDamage(damage);
 	return damage;
 }
 
 void Player::addItem(Item* item, Engine* engine) {
-	for(Item* inRoom : this->currentRoom->itemsInRoom) {
+	for(Item* inRoom : this->currentRoom->getItemsInRoom()) {
 		if(item == inRoom) {
 			this->inventory.push_back(inRoom);
 			this->currentRoom->removeItem(inRoom);
 			ClientHandler* ch = engine->playerToClient[this];
-			ch->sendMessage(string("Added " + inRoom->name + " to inventory.\n> "));
-			engine->parser->broadcastItem(this, inRoom->name, true);
+			ch->sendMessage(string("Added " + inRoom->getName() + " to inventory.\n> "));
+			engine->broadcastItem(this, inRoom->getName(), true);
 			return;
 		}
 	}
 }
 
 void Player::dropItem(Item* item, Engine* engine) {
-	this->currentRoom->itemsInRoom.push_back(item);
+	this->currentRoom->getItemsInRoom().push_back(item);
 	for(auto i = this->inventory.begin(); i != this->inventory.end(); ++i) {
 		if(*i == item) {
 			this->inventory.erase(i);
@@ -119,8 +167,8 @@ void Player::dropItem(Item* item, Engine* engine) {
 		}
 	}
 	ClientHandler* ch = engine->playerToClient[this];
-	ch->sendMessage(string("\nDropped " + item->name + ".\n"));
-	engine->parser->broadcastItem(this, item->name, false);
+	ch->sendMessage(string("\nDropped " + item->getName() + ".\n"));
+	engine->broadcastItem(this, item->getName(), false);
 }
 
 void Player::dropAllItems(Engine* engine) {
@@ -135,7 +183,7 @@ void Player::dropAllItems(Engine* engine) {
 int Player::getDamage() {
 	int totalDamage = this->damageBase;
 	for(Item* item : this->inventory) {
-		totalDamage += item->damage;
+		totalDamage += item->getDamage();
 	}
 	return totalDamage;
 }

@@ -23,14 +23,26 @@ const string UP = "up";
 const string DOWN = "down";
 
 struct Room {
+
+private:
 	string description;
 	vector<Item*> itemsInRoom;
 	vector<Actor*> charsInRoom;
 	vector<Player*> playersInRoom;
 
+public:
+
 	unordered_map<string, Room*> exits;
 	
 	Room(string description);
+
+	string getDescription() const;
+
+	vector<Item*>& getItemsInRoom();
+
+	vector<Actor*>& getCharsInRoom();
+
+	vector<Player*>& getPlayersInRoom();
 
 	vector<string> getExits();
 

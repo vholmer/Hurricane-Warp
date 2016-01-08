@@ -4,6 +4,22 @@ Room::Room(string description) {
 	this->description = description;
 }
 
+string Room::getDescription() const {
+	return this->description;
+}
+
+vector<Item*>& Room::getItemsInRoom() {
+	return this->itemsInRoom;
+}
+
+vector<Actor*>& Room::getCharsInRoom() {
+	return this->charsInRoom;
+}
+
+vector<Player*>& Room::getPlayersInRoom() {
+	return this->playersInRoom;
+}
+
 vector<string> Room::getExits() {
 	vector<string> exits;
 	for(pair<string, Room*> p : this->exits) {
@@ -19,12 +35,12 @@ void Room::addItem(Item* item) {
 
 void Room::addChar(Actor* actor) {
 	this->charsInRoom.push_back(actor);
-	actor->currentRoom = this;
+	actor->setRoom(this);
 }
 
 void Room::addPlayer(Player* p) {
 	this->playersInRoom.push_back(p);
-	p->currentRoom = this;
+	p->setRoom(this);
 }
 
 void Room::removeItem(Item* item) {

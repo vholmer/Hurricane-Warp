@@ -22,19 +22,23 @@ struct Actor;
 
 struct Engine {
 
+private:
+	future<void> managerThread;
+	future<void> tickThread;
+
 	Parser* parser;
-	unordered_map<Player*, ClientHandler*> playerToClient;
 	unordered_map<ClientHandler*, Player*> clientToPlayer;
-	RoomHandler* roomHandler;
 
 	bool spin;
 
 	vector<Player*> players;
 	vector<ClientHandler*> disconList;
 
-	future<void> managerThread;
-	future<void> tickThread;
+public:
+	RoomHandler* roomHandler;
 
+	unordered_map<Player*, ClientHandler*> playerToClient;
+	
 	Engine();
 
 	~Engine() {
@@ -42,6 +46,14 @@ struct Engine {
 		memHandle();
 		std::cout << "Finnishing MemHandler" << std::endl;
 	}
+
+	void globalBroadcast(string message);
+
+	void broadcast(Actor* fromActor, Room* prevRoom, bool leftRoom);
+
+	void broadcastItem(Player* p, string itemName, bool pickedUp);
+
+	void broadcastPlayerDamage(Actor* fromActor, Player* p, int dmg);
 
 	void clientManager();
 

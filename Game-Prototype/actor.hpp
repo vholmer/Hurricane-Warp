@@ -19,17 +19,17 @@ struct ClientHandler;
 
 struct Actor {
 
+protected:
+
 	Room* currentRoom;
 
 	string name;
 	string description;
-	string dialogue;
 
-	int actorID;
 	int health;
 	int damageBase;
 
-	bool markedForDeath = false;
+public:
 
 	void setDamageBase(int damageBase); //in actor.cpp
 
@@ -39,13 +39,19 @@ struct Actor {
 
 	virtual void die(Engine* engine);
 
-	void globalBroadcast(Engine* engine, string message);
+	string getName() const;
 
-	void broadcast(Engine* engine, Room* prevRoom, bool leftRoom);
+	string getDescription() const;
 
-	void broadcastPlayerDamage(Engine* engine, Player* p, int dmg);
+	int getHealth() const;
 
-	void broadcastActorDamage(Engine* engine, Actor* actor, int dmg);
+	Room* getRoom();
+
+	void takeDamage(int toSubtract);
+
+	void setRoom(Room* newRoom);
+
+protected:
 
 	void walk(Engine* engine); //in actor.cpp
 
@@ -55,11 +61,7 @@ struct Actor {
 
 	int fight(Player* p); //in actor.cpp
 
-	void talk(); //in actor.cpp
-
 	Player* playerInRoom(); // in actor.cpp
-
-	Item* itemInRoom(); // in actor.cpp
 };
 
 #endif

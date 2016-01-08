@@ -14,7 +14,7 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 		if(p->getExitMap().find(secondWord) != p->getExitMap().end()) {
 			if(p->getRoomInDir(secondWord) != 0) {
 				Room* nextRoom = p->getRoomInDir(secondWord);
-				Room* prevRoom = p->currentRoom;
+				Room* prevRoom = p->getRoom();
 				nextRoom->addPlayer(p);
 				prevRoom->removePlayer(p);
 				p->roomInfo(ch);
@@ -39,12 +39,12 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 	};
 
 	this->funcMap[cmd::INVENTORY] = [this, p, ch] (string secondWord = "") {
-		ch->sendMessage(p->printInventory());
+		ch->sendMessage(p->getInventoryString());
 	};
 
 	this->funcMap[cmd::TAKE] = [this, p, ch] (string secondWord = "") {
-		for(Item* inRoom : p->currentRoom->itemsInRoom) {
-			if(toLowerCase(inRoom->name) == secondWord) {
+		for(Item* inRoom : p->getRoom()->getItemsInRoom()) {
+			if(toLowerCase(inRoom->getName()) == secondWord) {
 				p->addItem(inRoom, engine);
 				return;
 			}
@@ -53,8 +53,8 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 	};
 
 	this->funcMap[cmd::DROP] = [this, p, ch] (string secondWord = "") {
-		for(Item* item : p->inventory) {
-			if(secondWord == toLowerCase(item->name)) {
+		for(Item* item : p->getInventory()) {
+			if(secondWord == toLowerCase(item->getName())) {
 				p->dropItem(item, engine);
 				ch->sendMessage(string("> "));
 				return;
@@ -68,38 +68,38 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 			ch->sendMessage(string("Fight who?\n> "));
 			return;
 		}
-		if(secondWord == toLowerCase(p->name)) {
+		if(secondWord == toLowerCase(p->getName())) {
 			ch->sendMessage(string("You cannot fight yourself!\n> "));
 			return;
 		}
-		for(Player* otherPlayer : p->currentRoom->playersInRoom) {
-			if(toLowerCase(otherPlayer->name) == secondWord) {
+		for(Player* otherPlayer : p->getRoom()->getPlayersInRoom()) {
+			if(toLowerCase(otherPlayer->getName()) == secondWord) {
 				int damageDone = p->fightPlayer(otherPlayer);
 
 				ch->sendMessage(string("You hit "
-					+ otherPlayer->name
+					+ otherPlayer->getName()
 					+ " for "
 					+ to_string(damageDone)
 					+ " damage.\n> "));
 
 				ClientHandler* otherCh = this->engine->playerToClient[otherPlayer];
 				otherCh->sendMessage(string("\n"
-					+ p->name + "hit you for "
+					+ p->getName() + "hit you for "
 					+ to_string(damageDone) + " damage."
-					+ " (" + to_string(otherPlayer->health)
-					+ "/" + to_string(otherPlayer->maxHealth)
+					+ " (" + to_string(otherPlayer->getHealth())
+					+ "/" + to_string(otherPlayer->getMaxHealth())
 					+ ")HP"
 					+ "\n> "));
 
 				return;
 			}
 		}
-		for(Actor* actor : p->currentRoom->charsInRoom) {
-			if(toLowerCase(actor->name) == secondWord) {
+		for(Actor* actor : p->getRoom()->getCharsInRoom()) {
+			if(toLowerCase(actor->getName()) == secondWord) {
 				int damageDone = p->fightActor(actor);
 
 				ch->sendMessage(string("You hit "
-					+ actor->name
+					+ actor->getName()
 					+ " for "
 					+ to_string(damageDone)
 					+ " damage.\n> "));
@@ -113,18 +113,18 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 	this->funcMap[cmd::EXAMINE] = [this, p, ch] (string secondWord = "") {
 		bool foundItem = false;
 		if(!foundItem) {
-			for(Item* inRoom : p->currentRoom->itemsInRoom) {
-				if(toLowerCase(inRoom->name) == secondWord) {
-					ch->sendMessage(string(inRoom->description));
+			for(Item* inRoom : p->getRoom()->getItemsInRoom()) {
+				if(toLowerCase(inRoom->getName()) == secondWord) {
+					ch->sendMessage(string(inRoom->getDescription()));
 					foundItem = true;
 					break;
 				}
 			}
 		}
 		if(!foundItem) {
-			for(Item* inInv : p->inventory) {
-				if(toLowerCase(inInv->name) == secondWord) {
-					ch->sendMessage(string(inInv->description));
+			for(Item* inInv : p->getInventory()) {
+				if(toLowerCase(inInv->getName()) == secondWord) {
+					ch->sendMessage(string(inInv->getDescription()));
 					foundItem = true;
 					break;
 				}
@@ -171,7 +171,7 @@ string Parser::toLowerCase(string str) {
 	return result;
 }
 
-string Parser::printIntro() {
+string Parser::getIntro() const {
 	string retString;
 	retString += "You have crashed on a mysterious planet!\n";
 	retString += "In the name of the Emperor, good luck.\n";
@@ -180,27 +180,15 @@ string Parser::printIntro() {
 }
 
 void Parser::broadcastMovement(Player* p, Room* prevRoom) {
-	for(Player* otherInRoom : p->currentRoom->playersInRoom) {
+	for(Player* otherInRoom : p->getRoom()->getPlayersInRoom()) {
 		if(otherInRoom != p) {
 			ClientHandler* ch = this->engine->playerToClient[otherInRoom];
-			ch->sendMessage(string("\n" + p->name + " has entered the room.\n> "));
+			ch->sendMessage(string("\n" + p->getName() + " has entered the room.\n> "));
 		}
 	}
-	for(Player* otherInRoom : prevRoom->playersInRoom) {
+	for(Player* otherInRoom : prevRoom->getPlayersInRoom()) {
 		ClientHandler* ch = this->engine->playerToClient[otherInRoom];
-		ch->sendMessage(string("\n" + p->name + " has left the room.\n> "));
-	}
-}
-
-void Parser::broadcastItem(Player* p, string itemName, bool pickedUp) {
-	for(Player* otherInRoom : p->currentRoom->playersInRoom) {
-		if(otherInRoom != p) {
-			ClientHandler* ch = this->engine->playerToClient[otherInRoom];
-			if(pickedUp)
-				ch->sendMessage(string("\n" + p->name + " took " + itemName + "\n> "));
-			else
-				ch->sendMessage(string("\n" + p->name + " dropped " + itemName + "\n> "));
-		}
+		ch->sendMessage(string("\n" + p->getName() + " has left the room.\n> "));
 	}
 }
 
@@ -208,16 +196,16 @@ void Parser::processCommand(Player* p, ClientHandler* ch, string str) {
 	this->setUpLambdas(p, ch);
 	vector<string> input = getInput(str);
 
-	if(p->askedForName == false) {
+	if(p->askedName() == false) {
 		if(input.size() > 2) {
 			ch->canSend = true;
 			ch->sendMessage(string("Name too long!\n"));
 			ch->canSend = false;
 		}
-		p->name = input[0];
-		p->askedForName = true;
+		p->setName(input[0]);
+		p->setAskedName(true);
 		ch->canSend = true;
-		ch->sendMessage(this->printIntro());
+		ch->sendMessage(this->getIntro());
 		p->roomInfo(ch);
 		return;
 	}

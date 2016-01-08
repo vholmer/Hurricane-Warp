@@ -19,6 +19,8 @@ struct Actor;
 struct Engine;
 
 struct Player {
+
+private:
 	string name;
 	Room* currentRoom;
 	vector<Item*> inventory;
@@ -28,13 +30,55 @@ struct Player {
 
 	bool askedForName;
 
+public:
+
 	Player();
 
-	Room* getRoomInDir(string dir);
+	string getName() const;
+
+	void setName(string newName);
+
+	Room* getRoom();
+
+	void setRoom(Room* newRoom);
+
+	vector<Item*>& getInventory();
+
+	int getHealth() const;
+
+	void setHealth(int health);
+
+	void takeDamage(int toSubtract);
+
+	int getMaxHealth() const;
+
+	int getDamageBase() const;
+
+	bool askedName() const;
+
+	void setAskedName(bool askedForName);
+
+	void dropAllItems(Engine* engine);
+
+	void broadcastDeath(Engine* engine);
+
+	void roomInfo(ClientHandler* ch);
 
 	unordered_map<string, Room*> getExitMap();
 
-	void broadcastDeath(Engine* engine);
+	Room* getRoomInDir(string dir);
+
+	string getInventoryString();
+
+	void addItem(Item* item, Engine* engine);
+
+	void dropItem(Item* item, Engine* engine);
+
+	int fightPlayer(Player* p);
+
+	int fightActor(Actor* a);
+
+private:
 
 	string printRoomDescription();
 
@@ -46,21 +90,7 @@ struct Player {
 
 	string printExits();
 
-	string printInventory();
-
-	int fightPlayer(Player* p);
-
-	int fightActor(Actor* a);
-
-	void addItem(Item* item, Engine* engine);
-
-	void dropItem(Item* item, Engine* engine);
-
-	void dropAllItems(Engine* engine);
-
 	int getDamage();
-
-	void roomInfo(ClientHandler* ch);
 };
 
 #endif

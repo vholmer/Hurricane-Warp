@@ -4,8 +4,6 @@ Cultist::Cultist(string name, string description) {
 	this->name = name;
 	this->description = description;
 
-	this->dialogue = "The Chaos gods are thirsty...your blood will do!";
-
 	this->health = 10;
 	this->setDamageBase(2);
 }
@@ -19,7 +17,7 @@ void Cultist::act(Engine* engine) {
 	}
 	if(randomPlayer != 0) {
 		int damage = this->fight(randomPlayer);
-		this->broadcastPlayerDamage(engine, randomPlayer, damage);
+		engine->broadcastPlayerDamage(this, randomPlayer, damage);
 		return;
 	}
 	this->walk(engine);
