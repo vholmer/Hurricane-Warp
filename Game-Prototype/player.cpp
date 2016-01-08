@@ -85,13 +85,13 @@ string Player::printInventory() {
 }
 
 int Player::fightPlayer(Player* p) {
-	int damage = rand() % this->getDamage() + 1;
+	int damage = rand() % this->damageBase + this->getDamage();
 	p->health -= damage;
 	return damage;
 }
 
 int Player::fightActor(Actor* a) {
-	int damage = rand() % this->getDamage() + 1;
+	int damage = rand() % this->damageBase + this->getDamage();
 	a->health -= damage;
 	return damage;
 }
