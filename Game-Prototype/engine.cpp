@@ -38,10 +38,6 @@ void Engine::memHandle() {
 
 	}
 
-	for(Actor* actor : this->roomHandler->npcMap) {
-		delete actor;
-	}
-
 	delete this->roomHandler;
 
 	cout.flush();
@@ -91,13 +87,16 @@ void Engine::checkPlayerHealth() {
 void Engine::checkActorHealth() {
 	checkMutex.lock();
 	vector<Actor*> toDelete;
-	for(Actor* actor : this->roomHandler->npcMap) {
+	for(int i = 0; i < this->roomHandler->npcMap.size(); ++i) {
+		Actor* actor = this->roomHandler->npcMap[i];
 		if(actor->health <= 0) {
 			for(Player* p : actor->currentRoom->playersInRoom) {
 				ClientHandler* ch = this->playerToClient[p];
 				ch->sendMessage(string("\n" + actor->name + " has died.\n> "));
 			}
 			actor->die(this);
+			delete actor;
+			--i;
 		}
 	}
 	this->roomHandler->npcMap.shrink_to_fit();
