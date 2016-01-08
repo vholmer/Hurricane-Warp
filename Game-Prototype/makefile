@@ -17,7 +17,7 @@ files += $(network)network.cpp
 files += $(network)socket.cpp
 
 all:
-	g++ -std=c++11 $(files) -lpthread -o server
+	g++ -std=c++11 $(files) -Wall -Wextra -pedantic -lpthread -o server
 
 clean:
 	rm -rf *.out.dSYM
