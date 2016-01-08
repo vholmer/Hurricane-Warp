@@ -29,6 +29,7 @@ void Player::setHealth(int health) {
 }
 
 void Player::takeDamage(int toSubtract) {
+	std::cerr << this << std::endl;
 	this->health -= toSubtract;
 }
 
@@ -53,6 +54,10 @@ Player::Player() {
 	this->health = 20;
 	this->askedForName = false;
 	this->damageBase = 5;
+}
+
+Player::~Player() {
+	std::cerr << "DESTROY EVERYTHING: " << this << std::endl;
 }
 
 Room* Player::getRoomInDir(string dir) {

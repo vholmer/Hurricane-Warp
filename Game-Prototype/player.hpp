@@ -34,6 +34,8 @@ public:
 
 	Player();
 
+	~Player();
+
 	string getName() const;
 
 	void setName(string newName);
