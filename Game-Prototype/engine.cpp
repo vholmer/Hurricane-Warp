@@ -50,17 +50,26 @@ void Engine::killConnections() {
 }
 
 void Engine::tickActors() {
+	cout << "1" << endl;
 	while(this->spin) {
+		cout << "2" << endl;
 		int sleepSeconds = (rand() % 7) + 6;
+		cout << "3" << endl;
 		usleep(sleepSeconds * 1000 * 1000);
+		cout << "4" << endl;
 		checkMutex.lock();
-		this->roomHandler->npcMap.shrink_to_fit();
+		cout << "5" << endl;
 		for(Actor* actor : this->roomHandler->npcMap) {
+			cout << "ACTLOOP 1" << endl;
 			actor->act(this);
+			cout << "ACTLOOP 2" << endl;
 		}
 		checkMutex.unlock();
+		cout << "6" << endl;
 		this->checkActorHealth();
+		cout << "7" << endl;
 		this->checkPlayerHealth();
+		cout << "8" << endl;
 	}
 }
 
