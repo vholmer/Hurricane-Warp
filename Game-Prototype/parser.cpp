@@ -69,7 +69,7 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 					+ to_string(damageDone)
 					+ " damage.\n> "));
 
-				ClientHandler* otherCh = engine->playerToClient[otherPlayer];
+				ClientHandler* otherCh = this->engine->playerToClient[otherPlayer];
 				otherCh->sendMessage(string(p->name
 					+ " hit you for "
 					+ to_string(damageDone)
