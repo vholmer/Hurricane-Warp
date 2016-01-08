@@ -58,6 +58,7 @@ void Engine::tickActors() {
 	while(this->spin) {
 		int sleepSeconds = (rand() % 7) + 6;
 		usleep(sleepSeconds * 1000 * 1000);
+		this->roomHandler->npcMap.shrink_to_fit();
 		for(Actor* actor : this->roomHandler->npcMap) {
 			actor->act(this);
 		}
