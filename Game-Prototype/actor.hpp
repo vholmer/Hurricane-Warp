@@ -39,7 +39,9 @@ struct Actor {
 
 	virtual void act(Engine* engine) = 0;
 
-	void die(Engine* engine);
+	virtual void die(Engine* engine);
+
+	void globalBroadcast(Engine* engine, string message);
 
 	void broadcast(Engine* engine, Room* prevRoom, bool leftRoom);
 

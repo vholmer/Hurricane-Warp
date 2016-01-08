@@ -1,49 +1,66 @@
 #include "roomhandler.hpp"
-#include "wizard.hpp"
+#include "cultist.hpp"
+#include "snilsson.hpp"
 
 #include <iostream>
 
 using namespace std;
 
-struct Wizard;
+struct Cultist;
+struct Snilsson;
 
 RoomHandler::RoomHandler() {
 	// ----- ROOM INITIATIONS BEGIN -----
 
 	Room* startRoom = new Room(string(
-		"You are in a dark forest."
+		"You are in a dark, twisted forest."
 		));
-	Item* knife = new Item(string("A very sharp knife."),
-		string("Knife")
+	Item* chainSword = new Item(string("A furiously deadly chain sword."),
+		string("Chain-Sword")
 		);
 
-	Room* clearing = new Room(string(
-		"You are in a small clearing. There is a red house here."
+	Room* cliff = new Room(string(
+		"You are at the edge of a steep cliff, overlooking a warp-infested valley."
 		));
-	Item* milk = new Item(string("A sealed jar of milk."),
-		string("Milk")
+	Item* caffeine = new Item(string("A sealed jar of caffeine."),
+		string("Caffeine")
 		);
 
-	startRoom->addItem(knife);
-	startRoom->exits[EAST] = clearing;
+	Room* warp = new Room(string(
+		"You are in the middle of the warp itself, not even the emperor can save you."
+		));
 
-	clearing->addItem(milk);
-	clearing->exits[WEST] = startRoom;
+	startRoom->addItem(chainSword);
+	cliff->addItem(caffeine);
+
+	startRoom->exits[EAST] = cliff;
+
+	cliff->exits[WEST] = startRoom;
+	cliff->exits[NORTH] = warp;
+
+	warp->exits[SOUTH] = cliff;
 
 	this->gameMap.push_back(startRoom);
-	this->gameMap.push_back(clearing);
+	this->gameMap.push_back(cliff);
+	this->gameMap.push_back(warp);
 
 	// ----- ROOM INITIATIONS END -----
 
 	// ----- ACTOR INITIATIONS BEGIN -----
 
-	Wizard* wizard = new Wizard(string("Snilsson"),
-		string("An evil wizard, breaking for-loops since 1984.")
+	Cultist* cultist = new Cultist(string("Mal-Ek"),
+		string("A cursed cultist, influenced by warp energies.")
 		);
 
-	clearing->addChar(wizard);
+	Snilsson* snilsson = new Snilsson(string("Sneel-Zon"),
+		string("The chaos god himself.")
+		);
 
-	this->npcMap.push_back(wizard);
+	cliff->addChar(cultist);
+	warp->addChar(snilsson);
+
+	this->npcMap.push_back(cultist);
+	this->npcMap.push_back(snilsson);
 	// ----- ACTOR INITIATIONS END -----
 }
 

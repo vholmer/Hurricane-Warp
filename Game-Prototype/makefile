@@ -5,9 +5,8 @@ files += item.cpp
 files += roomhandler.cpp
 files += room.cpp
 files += actor.cpp
-files += wizard.cpp
-#files += troll.cpp
-#files += villager.cpp
+files += cultist.cpp
+files += snilsson.cpp
 
 network = ../Network-Prototype/
 

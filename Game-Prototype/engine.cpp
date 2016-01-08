@@ -117,8 +117,8 @@ void Engine::tickActors() {
 			actor->act(this);
 			cout << "ACTLOOP 2" << endl;
 		}
-		checkMutex.unlock();
 		cout << "6" << endl;
+		checkMutex.unlock();
 		this->checkActorHealth();
 		cout << "7" << endl;
 		this->checkPlayerHealth();
@@ -137,7 +137,7 @@ void Engine::checkPlayerHealth() {
 			p->broadcastDeath(this);
 			this->roomHandler->start()->addPlayer(p);
 			prevRoom->removePlayer(p);
-			ch->sendMessage(string("\nYou have died.\nIt is better to live for the emperor, than to die for yourself.\n"));
+			ch->sendMessage(string("\nYou have died.\nIt is better to die for the emperor, than to live for yourself.\n"));
 			ch->sendMessage(this->parser->printIntro());
 			p->roomInfo(ch);
 			p->health = 100;
@@ -171,7 +171,9 @@ void Engine::addPlayer(ClientHandler* c, string name) {
 	p->currentRoom = this->roomHandler->start();
 	this->roomHandler->start()->addPlayer(p);
 	if(p->askedForName == false) {
-		c->sendMessage(string("\nWhat is your name?\n> "));
+		c->sendMessage(string("\n")
+			+ string("Welcome to Hurricane Warp. Type help if you get stuck!\n")
+			+ string("What is your name?\n> "));
 		c->canSend = false;
 	}
 	this->clientToPlayer[c] = p;

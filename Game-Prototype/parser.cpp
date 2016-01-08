@@ -8,7 +8,7 @@ Parser::Parser(Engine* engine) {
 void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 	this->funcMap[cmd::GO] = [this, p, ch] (string secondWord = "") {
 		if(secondWord == "") {
-			ch->sendMessage(string("Go where?\n"));;
+			ch->sendMessage(string("Go where?\n> "));;
 			return;
 		}
 		if(p->getExitMap().find(secondWord) != p->getExitMap().end()) {
@@ -30,7 +30,12 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 	};
 
 	this->funcMap[cmd::HELP] = [this, ch] (string secondWord = "") {
-		ch->sendMessage(string("God can't help you now!\n> "));
+		string toSend = "The Emperor protects, these are your commands:\n";
+		for(pair<string, cmd> p : this->commands) {
+			toSend += p.first + " ";
+		}
+		toSend += "\n> ";
+		ch->sendMessage(string(toSend));
 	};
 
 	this->funcMap[cmd::INVENTORY] = [this, p, ch] (string secondWord = "") {
@@ -59,6 +64,10 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 	};
 
 	this->funcMap[cmd::FIGHT] = [this, p, ch] (string secondWord = "") {
+		if(secondWord == toLowerCase(p->name)) {
+			ch->sendMessage(string("You cannot fight yourself!\n> "));
+			return;
+		}
 		for(Player* otherPlayer : p->currentRoom->playersInRoom) {
 			if(toLowerCase(otherPlayer->name) == secondWord) {
 				int damageDone = p->fightPlayer(otherPlayer);
@@ -70,7 +79,8 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 					+ " damage.\n> "));
 
 				ClientHandler* otherCh = this->engine->playerToClient[otherPlayer];
-				otherCh->sendMessage(string(p->name
+				otherCh->sendMessage(string("\n"
+					+ p->name
 					+ " hit you for "
 					+ to_string(damageDone)
 					+ " damage.\n> "));
@@ -91,6 +101,7 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 				return;
 			}
 		}
+		ch->sendMessage(string("That person is not here.\n> "));
 	};
 }
 
@@ -170,7 +181,7 @@ void Parser::processCommand(Player* p, ClientHandler* ch, string str) {
 			ch->sendMessage(string("Name too long!\n"));
 			ch->canSend = false;
 		}
-		p->name = str;
+		p->name = input[0];
 		p->askedForName = true;
 		ch->canSend = true;
 		ch->sendMessage(this->printIntro());

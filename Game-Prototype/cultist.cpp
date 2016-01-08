@@ -1,19 +1,17 @@
-#include "wizard.hpp"
+#include "cultist.hpp"
 
-Wizard::Wizard(string name, string description) {
+Cultist::Cultist(string name, string description) {
 	this->name = name;
 	this->description = description;
 
-	this->dialogue = "I will curse you thoroughly!";
+	this->dialogue = "The Chaos gods are thirsty...your blood will do!";
 
 	this->health = 10;
-	this->mana = 10;
 	this->setDamageBase(2);
 }
 
 // Next level AI right here
-void Wizard::act(Engine* engine) {
-	this->mana += 1;
+void Cultist::act(Engine* engine) {
 	Player* randomPlayer = this->playerInRoom();
 	if(this->health < 3) {
 		this->walk(engine);

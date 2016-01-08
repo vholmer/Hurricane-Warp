@@ -16,6 +16,13 @@ void Actor::die(Engine* engine) {
 	}
 }
 
+void Actor::globalBroadcast(Engine* engine, string message) {
+	for(Player* p : engine->players) {
+		ClientHandler* ch = engine->playerToClient[p];
+		ch->sendMessage(string("\n" + message));
+	}
+}
+
 void Actor::broadcast(Engine* engine, Room* room, bool leftRoom) {
 	for(Player* p : room->playersInRoom) {
 		ClientHandler* ch = engine->playerToClient[p];
