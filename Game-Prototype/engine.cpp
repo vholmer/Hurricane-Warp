@@ -130,9 +130,9 @@ void Engine::addPlayer(ClientHandler* c, string name) {
 void Engine::parseInput(ClientHandler* ch, string str) {
 	globalMutex.lock();
 	Player* p = this->clientToPlayer[ch];
-	this->checkPlayerHealth();
 	parser->processCommand(p, ch, str);
 	this->checkActorHealth();
+	this->checkPlayerHealth();
 	globalMutex.unlock();
 }
 
