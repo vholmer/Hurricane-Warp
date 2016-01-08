@@ -1,7 +1,8 @@
 #include "player.hpp"
 
 Player::Player() {
-	this->health = 5;
+	this->maxHealth = 20;
+	this->health = 20;
 	this->askedForName = false;
 	this->damageBase = 200;
 }

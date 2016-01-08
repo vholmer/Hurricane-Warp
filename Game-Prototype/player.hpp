@@ -23,6 +23,7 @@ struct Player {
 	Room* currentRoom;
 	vector<Item*> inventory;
 	int health;
+	int maxHealth;
 	int damageBase;
 
 	bool askedForName;

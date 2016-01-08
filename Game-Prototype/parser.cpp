@@ -103,6 +103,32 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 		}
 		ch->sendMessage(string("That person is not here.\n> "));
 	};
+
+	this->funcMap[cmd::EXAMINE] = [this, p, ch] (string secondWord = "") {
+		bool foundItem = false;
+		if(!foundItem) {
+			for(Item* inRoom : p->currentRoom->itemsInRoom) {
+				if(toLowerCase(inRoom->name) == secondWord) {
+					ch->sendMessage(string(inRoom->description) + "\n");
+					foundItem = true;
+					break;
+				}
+			}
+		}
+		if(!foundItem) {
+			for(Item* inInv : p->inventory) {
+				if(toLowerCase(inInv->name) == secondWord) {
+					ch->sendMessage(string(inInv->description) + "\n");
+					foundItem = true;
+					break;
+				}
+			}
+		}
+		if(foundItem)
+			ch->sendMessage(string("\n> "));
+		else
+			ch->sendMessage(string("That item does not exist.\n> "));
+	};
 }
 
 void Parser::setUpCommands() {
@@ -113,6 +139,7 @@ void Parser::setUpCommands() {
 	this->commands["take"] = cmd::TAKE;
 	this->commands["drop"] = cmd::DROP;
 	this->commands["fight"] = cmd::FIGHT;
+	this->commands["examine"] = cmd::EXAMINE;
 }
 
 vector<string> Parser::getInput(string str) {
