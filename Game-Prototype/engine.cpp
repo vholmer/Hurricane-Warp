@@ -39,6 +39,10 @@ void Engine::memHandle() {
 
 	}
 
+	for(Actor* actor : this->roomHandler->npcMap) {
+		delete actor;
+	}
+
 	delete this->roomHandler;
 
 	cout.flush();

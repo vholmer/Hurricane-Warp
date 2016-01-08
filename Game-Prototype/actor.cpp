@@ -6,13 +6,6 @@ void Actor::setDamageBase(int damageBase) {
 
 void Actor::die(Engine* engine) {
 	this->currentRoom->removeChar(this);
-	auto begin = engine->roomHandler->npcMap.begin();
-	auto end = engine->roomHandler->npcMap.end();
-	for(auto i = begin; i != end; ++i) {
-		if(*i == this) {
-			engine->roomHandler->npcMap.erase(i);
-		}
-	}
 }
 
 void Actor::broadcast(Engine* engine, Room* room, bool leftRoom) {
