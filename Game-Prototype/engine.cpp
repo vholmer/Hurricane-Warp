@@ -118,6 +118,15 @@ void Engine::tickActors() {
 			actor->act(this);
 			cout << "ACTLOOP 2" << endl;
 		}
+		string daemon = "Daemon";
+		bool daemonAlive= false;
+		for(Actor* actor : this->roomHandler->npcMap) {
+			if(actor->name == daemon)
+				daemonAlive = true;
+		}
+		if(!daemonAlive) {
+			this->roomHandler->spawnDaemon(this);
+		}
 		cout << "6" << endl;
 		checkMutex.unlock();
 		this->checkActorHealth();

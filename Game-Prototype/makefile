@@ -7,6 +7,7 @@ files += room.cpp
 files += actor.cpp
 files += cultist.cpp
 files += snilsson.cpp
+files += daemon.cpp
 
 network = ../Network-Prototype/
 

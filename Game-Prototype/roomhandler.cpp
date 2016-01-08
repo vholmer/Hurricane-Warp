@@ -1,6 +1,7 @@
 #include "roomhandler.hpp"
 #include "cultist.hpp"
 #include "snilsson.hpp"
+#include "daemon.hpp"
 
 #include <iostream>
 
@@ -108,16 +109,31 @@ RoomHandler::RoomHandler() {
 		string("The chaos god himself.")
 		);
 
+	Daemon* demon = new Daemon(string("Daemon"),
+		string("An abomination from the depths of the warp.")
+		);
+
 	cross->addChar(cultist1);
 	cross->addChar(cultist2);
 	cross->addChar(cultist3);
 	warp->addChar(snilsson);
+	abyss->addChar(demon);
 
 	this->npcMap.push_back(cultist1);
 	this->npcMap.push_back(cultist2);
 	this->npcMap.push_back(cultist3);
 	this->npcMap.push_back(snilsson);
+	this->npcMap.push_back(demon);
 	// ----- ACTOR INITIATIONS END -----
+}
+
+void RoomHandler::spawnDaemon(Engine* engine) {
+	Daemon* demon = new Daemon(string("Daemon"),
+	string("An abomination from the depths of the warp.")
+	);
+	this->gameMap[5]->addChar(demon);
+	this->npcMap.push_back(demon);
+	demon->globalBroadcast(engine, string("Daemon is alive!"));
 }
 
 Room* RoomHandler::start() {

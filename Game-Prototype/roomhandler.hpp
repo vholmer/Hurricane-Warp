@@ -11,6 +11,7 @@ using namespace std;
 
 struct Room;
 struct Actor;
+struct Engine;
 
 struct RoomHandler {
 	vector<Room*> gameMap;
@@ -19,6 +20,8 @@ struct RoomHandler {
 	RoomHandler();
 
 	Room* start();
+
+	void spawnDaemon(Engine* engine);
 };
 
 #endif
