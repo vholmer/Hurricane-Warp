@@ -98,11 +98,7 @@ void Engine::checkActorHealth() {
 				ch->sendMessage(string("\n" + actor->name + " has died.\n> "));
 			}
 			actor->die(this);
-			toDelete.push_back(actor);
 		}
-	}
-	for(Actor* actor : toDelete) {
-		delete actor;
 	}
 	this->roomHandler->npcMap.shrink_to_fit();
 	checkMutex.unlock();
