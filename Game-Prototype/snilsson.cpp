@@ -11,7 +11,7 @@ Snilsson::Snilsson(string name, string description) {
 // Next level AI right here
 void Snilsson::act(Engine* engine) {
 	Player* weakPlayer = this->weakestPlayer();
-	if(weakPlayer != 0) {
+	if(weakPlayer != nullptr) {
 		int damage = this->fight(weakPlayer);
 		engine->broadcastPlayerDamage(this, weakPlayer, damage);
 		return;
@@ -19,7 +19,7 @@ void Snilsson::act(Engine* engine) {
 }
 
 Player* Snilsson::weakestPlayer() {
-	Player* weakest;
+	Player* weakest = nullptr;
 	bool firstIteration = true;
 	for(Player* p : this->currentRoom->getPlayersInRoom()) {
 		if(firstIteration) {
