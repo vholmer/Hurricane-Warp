@@ -133,7 +133,7 @@ void RoomHandler::spawnDaemon(Engine* engine) {
 	);
 	this->gameMap[5]->addChar(demon);
 	this->npcMap.push_back(demon);
-	demon->globalBroadcast(engine, string("Daemon is alive!"));
+	demon->globalBroadcast(engine, string("Daemon is alive!\n> "));
 }
 
 Room* RoomHandler::start() {
