@@ -53,6 +53,8 @@ public:
 
 private:
 
+	void look(string secondWord, Player* p, ClientHandler* ch);
+
 	void setUpLambdas(Player* p, ClientHandler* ch);
 
 	void setUpCommands();
