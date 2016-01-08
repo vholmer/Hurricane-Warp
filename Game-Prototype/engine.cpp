@@ -3,8 +3,7 @@
 using namespace std;
 
 mutex globalMutex;
-mutex checkActMutex;
-mutex checkPlrMutex;
+mutex checkMutex;
 
 Engine::Engine() {
 	this->parser = new Parser(this);
@@ -68,7 +67,7 @@ void Engine::tickActors() {
 }
 
 void Engine::checkPlayerHealth() {
-	checkPlrMutex.lock();
+	checkMutex.lock();
 	this->players.shrink_to_fit();
 	for(Player* p : this->players) {
 		ClientHandler* ch = this->playerToClient[p];
@@ -84,11 +83,11 @@ void Engine::checkPlayerHealth() {
 			p->health = 100;
 		}
 	}
-	checkPlrMutex.unlock();
+	checkMutex.unlock();
 }
 
 void Engine::checkActorHealth() {
-	checkActMutex.lock();
+	checkMutex.lock();
 	vector<Actor*> toDelete;
 	for(Actor* actor : this->roomHandler->npcMap) {
 		if(actor->health <= 0) {
@@ -104,7 +103,7 @@ void Engine::checkActorHealth() {
 		delete actor;
 	}
 	this->roomHandler->npcMap.shrink_to_fit();
-	checkActMutex.unlock();
+	checkMutex.unlock();
 }
 
 void Engine::addPlayer(ClientHandler* c, string name) {
