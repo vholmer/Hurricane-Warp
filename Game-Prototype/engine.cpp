@@ -20,8 +20,8 @@ void Engine::clientManager() {
 		disconMutex.lock();
 		checkMutex.lock();
 		usleep(100000);
-		globalMutex.lock();
 		for(ClientHandler* ch : this->disconList) {
+			globalMutex.lock();
 			Player* p = this->clientToPlayer[ch];
 			p->dropAllItems(this);
 			for(Item* item : p->inventory) {
@@ -49,9 +49,9 @@ void Engine::clientManager() {
 			this->clientToPlayer.erase(ch);
 			delete ch;
 			delete p;
+			globalMutex.unlock();
 			break;
 		}
-		globalMutex.unlock();
 		checkMutex.unlock();
 		disconMutex.unlock();
 	}

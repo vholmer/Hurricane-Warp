@@ -15,53 +15,105 @@ RoomHandler::RoomHandler() {
 	Room* startRoom = new Room(string(
 		"You are in a dark, twisted forest."
 		));
-	Item* chainSword = new Item(string("A furiously deadly chain sword."),
-		string("Chain-Sword"),
-		20
-		);
-
 	Room* cliff = new Room(string(
 		"You are at the edge of a steep cliff, overlooking a warp-infested valley."
 		));
-	Item* caffeine = new Item(string("A sealed jar of caffeine."),
-		string("Caffeine"),
-		0
+	Room* cross = new Room(string("You are at a crossroads in the forest.\n")
+		 + string("To the north, there is a warp-infested village.\n")
+		 + string("To the west, there is a series of steep cliffs, overlooking the valley.\n")
+		 + string("To the east you can see the mouth of a cave.\n")
+		 + string("To the south there is a crashed ship. Possibly the one you came in.")
 		);
-
+	Room* cave = new Room(string("You are in a pitch-black cave. Something is lurking in the darkness..."));
+	Room* abyss = new Room(string("The darkness creeps ever closer. Beware."));
+	Room* crash = new Room(string("You are next to a huge cruiser wreckage.\n")
+		+ string("Debris is is scattered everywhere."));
+	Room* village = new Room(string("You are in a village plagued by warp storms."));
+	Room* church = new Room(string("You are inside a huge cathedral.\n")
+		+ string("A huge warp rift is humming at the end of the hall."));
 	Room* warp = new Room(string(
 		"You are in the middle of the warp itself, not even the emperor can save you."
 		));
 
-	startRoom->addItem(chainSword);
-	cliff->addItem(caffeine);
+	Item* knife = new Item(string("A blade, simple but functional."),
+		string("Knife"),
+		5);
+	Item* chainSword = new Item(string("A furiously deadly chain sword."),
+		string("Chain-Sword"),
+		20);
+	Item* bolter = new Item(string("A standard issue heavy bolter."),
+		string("Bolter"),
+		15);
+	Item* caffeine = new Item(string("A sealed jar of caffeine."),
+		string("Caffeine"),
+		1);
+
+	cross->addItem(caffeine);
+	abyss->addItem(bolter);
+	cross->addItem(knife);
+	crash->addItem(chainSword);
 
 	startRoom->exits[EAST] = cliff;
 
 	cliff->exits[WEST] = startRoom;
-	cliff->exits[NORTH] = warp;
+	cliff->exits[EAST] = cross;
 
-	warp->exits[SOUTH] = cliff;
+	cross->exits[WEST] = cliff;
+	cross->exits[SOUTH] = crash;
+	cross->exits[EAST] = cave;
+	cross->exits[NORTH] = village;
+
+	crash->exits[NORTH] = cross;
+
+	cave->exits[WEST] = cross;
+	cave->exits[DOWN] = abyss;
+
+	abyss->exits[UP] = cave;
+
+	village->exits[SOUTH] = cross;
+	village->exits[NORTH] = church;
+
+	church->exits[SOUTH] = village;
+	church->exits[NORTH] = warp;
 
 	this->gameMap.push_back(startRoom);
 	this->gameMap.push_back(cliff);
+	this->gameMap.push_back(cross);
+	this->gameMap.push_back(crash);
+	this->gameMap.push_back(cave);
+	this->gameMap.push_back(abyss);
+	this->gameMap.push_back(village);
+	this->gameMap.push_back(church);
 	this->gameMap.push_back(warp);
 
 	// ----- ROOM INITIATIONS END -----
 
 	// ----- ACTOR INITIATIONS BEGIN -----
 
-	Cultist* cultist = new Cultist(string("Mal-Ek"),
+	Cultist* cultist1 = new Cultist(string("Mal-Ek"),
 		string("A cursed cultist, influenced by warp energies.")
+		);
+
+	Cultist* cultist2 = new Cultist(string("El-Rok"),
+		string("A twisted cultist, consumed by chaos.")
+		);
+
+	Cultist* cultist3 = new Cultist(string("Malgor"),
+		string("A psyker cultist, thirsting for blood.")
 		);
 
 	Snilsson* snilsson = new Snilsson(string("Sneel-Zon"),
 		string("The chaos god himself.")
 		);
 
-	cliff->addChar(cultist);
+	cross->addChar(cultist1);
+	cross->addChar(cultist2);
+	cross->addChar(cultist3);
 	warp->addChar(snilsson);
 
-	this->npcMap.push_back(cultist);
+	this->npcMap.push_back(cultist1);
+	this->npcMap.push_back(cultist2);
+	this->npcMap.push_back(cultist3);
 	this->npcMap.push_back(snilsson);
 	// ----- ACTOR INITIATIONS END -----
 }
