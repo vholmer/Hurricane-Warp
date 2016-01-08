@@ -23,6 +23,7 @@ void Engine::clientManager() {
 		for(ClientHandler* ch : this->disconList) {
 			globalMutex.lock();
 			Player* p = this->clientToPlayer[ch];
+			p->dropAllItems(this);
 			for(Item* item : p->inventory) {
 				delete item;
 			}

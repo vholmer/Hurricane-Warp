@@ -109,7 +109,7 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 		if(!foundItem) {
 			for(Item* inRoom : p->currentRoom->itemsInRoom) {
 				if(toLowerCase(inRoom->name) == secondWord) {
-					ch->sendMessage(string(inRoom->description) + "\n");
+					ch->sendMessage(string(inRoom->description));
 					foundItem = true;
 					break;
 				}
@@ -118,7 +118,7 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 		if(!foundItem) {
 			for(Item* inInv : p->inventory) {
 				if(toLowerCase(inInv->name) == secondWord) {
-					ch->sendMessage(string(inInv->description) + "\n");
+					ch->sendMessage(string(inInv->description));
 					foundItem = true;
 					break;
 				}
