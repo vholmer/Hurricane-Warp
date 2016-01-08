@@ -159,29 +159,31 @@ void Engine::tickActors() {
 		int sleepSeconds = (rand() % 7) + 6;
 		cout << "3" << endl;
 		usleep(sleepSeconds * 1000 * 1000);
-		cout << "4" << endl;
-		checkMutex.lock();
-		cout << "5" << endl;
-		for(Actor* actor : this->roomHandler->npcMap) {
-			cout << "ACTLOOP 1" << endl;
-			actor->act(this);
-			cout << "ACTLOOP 2" << endl;
+		if(this->players.size() > 0) {
+			cout << "4" << endl;
+			checkMutex.lock();
+			cout << "5" << endl;
+			for(Actor* actor : this->roomHandler->npcMap) {
+				cout << "ACTLOOP 1" << endl;
+				actor->act(this);
+				cout << "ACTLOOP 2" << endl;
+			}
+			string daemon = "Daemon";
+			bool daemonAlive= false;
+			for(Actor* actor : this->roomHandler->npcMap) {
+				if(actor->getName() == daemon)
+					daemonAlive = true;
+			}
+			if(!daemonAlive) {
+				this->roomHandler->spawnDaemon(this);
+			}
+			cout << "6" << endl;
+			checkMutex.unlock();
+			this->checkActorHealth();
+			cout << "7" << endl;
+			this->checkPlayerHealth();
+			cout << "8" << endl;
 		}
-		string daemon = "Daemon";
-		bool daemonAlive= false;
-		for(Actor* actor : this->roomHandler->npcMap) {
-			if(actor->getName() == daemon)
-				daemonAlive = true;
-		}
-		if(!daemonAlive) {
-			this->roomHandler->spawnDaemon(this);
-		}
-		cout << "6" << endl;
-		checkMutex.unlock();
-		this->checkActorHealth();
-		cout << "7" << endl;
-		this->checkPlayerHealth();
-		cout << "8" << endl;
 	}
 }
 
