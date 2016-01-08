@@ -37,7 +37,9 @@ struct Engine {
 	Engine();
 
 	~Engine() {
+		std::cout << "Memhandlar" << std::endl;
 		memHandle();
+		std::cout << "Finnishing MemHandler" << std::endl;
 	}
 
 	void clientManager();
