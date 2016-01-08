@@ -30,6 +30,7 @@ struct Engine {
 	bool spin;
 
 	vector<Player*> players;
+	vector<ClientHandler*> disconList;
 
 	future<void> managerThread;
 	future<void> tickThread;
@@ -43,6 +44,8 @@ struct Engine {
 	}
 
 	void clientManager();
+
+	void setDisconnected(ClientHandler* ch);
 
 	void deleteClient(Player* p, ClientHandler* ch);
 

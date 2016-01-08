@@ -4,18 +4,68 @@ using namespace std;
 
 mutex globalMutex;
 mutex checkMutex;
+mutex disconMutex;
 
 Engine::Engine() {
 	this->parser = new Parser(this);
 	this->roomHandler = new RoomHandler();
 	this->spin = true;
 	this->tickThread = async(std::launch::async, &Engine::tickActors, this);
+	this->managerThread = async(std::launch::async, &Engine::clientManager, this);
 
+}
+
+void Engine::clientManager() {
+	while(this->spin) {
+		disconMutex.lock();
+		checkMutex.lock();
+		usleep(100000);
+		for(ClientHandler* ch : this->disconList) {
+			globalMutex.lock();
+			Player* p = this->clientToPlayer[ch];
+			for(Item* item : p->inventory) {
+				delete item;
+			}
+			p->currentRoom->removePlayer(p);
+			auto begiP = this->players.begin();
+			auto endP  = this->players.end();
+			for(auto i = begiP; i != endP; ++i) {
+				if(*i == p) {
+					this->players.erase(i);
+					this->players.shrink_to_fit();
+					break;
+				}
+			}
+			auto begin = this->disconList.begin();
+			auto end = this->disconList.end();
+			for(auto i = begin; i != end; ++i) {
+				if(*i == ch) {
+					this->disconList.erase(i);
+					break;
+				}
+			}
+			this->playerToClient.erase(p);
+			this->clientToPlayer.erase(ch);
+			delete ch;
+			delete p;
+			globalMutex.unlock();
+			break;
+		}
+		checkMutex.unlock();
+		disconMutex.unlock();
+	}
+}
+
+void Engine::setDisconnected(ClientHandler* ch) {
+	disconMutex.lock();
+	this->disconList.push_back(ch);
+	disconMutex.unlock();
 }
 
 void Engine::memHandle() {
 	this->spin = false;
 	this->tickThread.wait();
+	this->managerThread.wait();
 
 	delete this->parser;
 
@@ -82,12 +132,11 @@ void Engine::checkPlayerHealth() {
 	for(Player* p : this->players) {
 		ClientHandler* ch = this->playerToClient[p];
 		if(p->health <= 0) {
-			ch->canSend = false;
 			Room* prevRoom = p->currentRoom;
+			p->dropAllItems(this);
+			p->broadcastDeath(this);
 			this->roomHandler->start()->addPlayer(p);
 			prevRoom->removePlayer(p);
-			ch->canSend = true;
-			p->broadcastDeath(this);
 			ch->sendMessage(string("\nYou have died.\nIt is better to live for the emperor, than to die for yourself.\n"));
 			ch->sendMessage(this->parser->printIntro());
 			p->roomInfo(ch);

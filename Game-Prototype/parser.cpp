@@ -40,9 +40,7 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 	this->funcMap[cmd::TAKE] = [this, p, ch] (string secondWord = "") {
 		for(Item* inRoom : p->currentRoom->itemsInRoom) {
 			if(toLowerCase(inRoom->name) == secondWord) {
-				p->addItem(inRoom);
-				ch->sendMessage(string("Added " + inRoom->name + " to inventory.\n> "));
-				this->broadcastItem(p, inRoom->name, true);
+				p->addItem(inRoom, engine);
 				return;
 			}
 		}
@@ -52,9 +50,8 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 	this->funcMap[cmd::DROP] = [this, p, ch] (string secondWord = "") {
 		for(Item* item : p->inventory) {
 			if(secondWord == toLowerCase(item->name)) {
-				p->dropItem(item);
-				ch->sendMessage(string("Dropped " + item->name + ".\n> "));
-				this->broadcastItem(p, item->name, false);
+				p->dropItem(item, engine);
+				ch->sendMessage(string("> "));
 				return;
 			}
 		}

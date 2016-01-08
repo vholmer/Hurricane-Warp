@@ -95,22 +95,38 @@ int Player::fightActor(Actor* a) {
 	return damage;
 }
 
-void Player::addItem(Item* item) {
+void Player::addItem(Item* item, Engine* engine) {
 	for(Item* inRoom : this->currentRoom->itemsInRoom) {
 		if(item == inRoom) {
 			this->inventory.push_back(inRoom);
 			this->currentRoom->removeItem(inRoom);
+			ClientHandler* ch = engine->playerToClient[this];
+			ch->sendMessage(string("Added " + inRoom->name + " to inventory.\n> "));
+			engine->parser->broadcastItem(this, inRoom->name, true);
+			return;
 		}
 	}
 }
 
-void Player::dropItem(Item* item) {
+void Player::dropItem(Item* item, Engine* engine) {
 	this->currentRoom->itemsInRoom.push_back(item);
 	for(auto i = this->inventory.begin(); i != this->inventory.end(); ++i) {
 		if(*i == item) {
 			this->inventory.erase(i);
 			this->inventory.shrink_to_fit();
-			return;
+			break;
+		}
+	}
+	ClientHandler* ch = engine->playerToClient[this];
+	ch->sendMessage(string("\nDropped " + item->name + ".\n"));
+	engine->parser->broadcastItem(this, item->name, false);
+}
+
+void Player::dropAllItems(Engine* engine) {
+	while(this->inventory.size() > 0) {
+		for(Item* item : this->inventory) {
+			this->dropItem(item, engine);
+			break;
 		}
 	}
 }

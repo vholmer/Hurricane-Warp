@@ -9,8 +9,4 @@ struct Wizard : public Actor {
 	Wizard(string name, string description);
 
 	virtual void act(Engine* engine) override;
-
-	int enchant(Actor* a);
-
-	int enchant(Player* p);
 };

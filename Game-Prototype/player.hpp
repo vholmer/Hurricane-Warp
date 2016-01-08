@@ -51,9 +51,11 @@ struct Player {
 
 	int fightActor(Actor* a);
 
-	void addItem(Item* item);
+	void addItem(Item* item, Engine* engine);
 
-	void dropItem(Item* item);
+	void dropItem(Item* item, Engine* engine);
+
+	void dropAllItems(Engine* engine);
 
 	void roomInfo(ClientHandler* ch);
 };

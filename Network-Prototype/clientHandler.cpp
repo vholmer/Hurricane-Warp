@@ -126,6 +126,7 @@ void ClientHandler::HandleInput(int socket) {
 			std::cout << "End connection" << std::endl;
 			std::cout << "We are done here" << std::endl;
 			this->endConnection();
+			this->engine->setDisconnected(this);
 			break;
 			}
 		case MessageCode::MessageMessage : {
@@ -220,7 +221,6 @@ void ClientHandler::quitConnection() {
 	close(this->socket.load()); // close socket
 	std::cout << "TRÅDEN ÄR HELT KLAR" << std::endl;
 	send_mutex.unlock();
-
 }
 
 /*

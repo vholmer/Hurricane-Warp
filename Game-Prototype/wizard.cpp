@@ -19,27 +19,10 @@ void Wizard::act(Engine* engine) {
 		this->walk(engine);
 		return;
 	}
-	/*if(this->mana >= 5 && randomPlayer != 0) {
-		this->enchant(randomPlayer);
-		this->mana -= 3;
-		engine->checkHealth(randomPlayer, engine->playerToClient[randomPlayer]);
-		return;
-	} else*/ if(randomPlayer != 0) {
+	if(randomPlayer != 0) {
 		int damage = this->fight(randomPlayer);
 		this->broadcastPlayerDamage(engine, randomPlayer, damage);
 		return;
 	}
 	this->walk(engine);
-}
-
-int Wizard::enchant(Actor* a) {
-	int damage = rand() % damageBase + 9;
-	a->health -= damage;
-	return damage;
-}
-
-int Wizard::enchant(Player* p) {
-	int damage = rand() % damageBase + 29;
-	p->health -= damage;
-	return damage;
 }
