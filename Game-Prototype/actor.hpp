@@ -31,8 +31,6 @@ struct Actor {
 
 	bool markedForDeath = false;
 
-	vector<Item*> inventory;
-
 	void setDamageBase(int damageBase); //in actor.cpp
 
 	virtual ~Actor() = default;
@@ -56,10 +54,6 @@ struct Actor {
 	int fight(Actor* a); //in actor.cpp
 
 	int fight(Player* p); //in actor.cpp
-
-	void pick_up(Item* a); //in actor.cpp
-
-	void drop(Item* a); //in actor.cpp
 
 	void talk(); //in actor.cpp
 

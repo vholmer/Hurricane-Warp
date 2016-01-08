@@ -93,21 +93,6 @@ int Actor::fight(Player* p) {
 	return damage;
 }
 
-void Actor::pick_up(Item* a) {
-	this->inventory.push_back(a);
-	this->currentRoom->removeItem(a);
-}
-
-void Actor::drop(Item* a) {
-	for(auto i = this->inventory.begin(); i != this->inventory.end(); ++i) {
-		if(*i == a) {
-			this->currentRoom->addItem(a);
-			this->inventory.erase(i);
-			this->inventory.shrink_to_fit();
-		}
-	}
-}
-
 void Actor::talk() {
 	if(this->playerInRoom() != 0) {
 		cout << this->dialogue << endl;
