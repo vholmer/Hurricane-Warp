@@ -15,7 +15,7 @@ void Cultist::act(Engine* engine) {
 		this->walk(engine);
 		return;
 	}
-	if(randomPlayer != 0) {
+	if(randomPlayer != nullptr) {
 		int damage = this->fight(randomPlayer);
 		engine->broadcastPlayerDamage(this, randomPlayer, damage);
 		return;

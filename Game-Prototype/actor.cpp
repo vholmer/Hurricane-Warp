@@ -61,7 +61,7 @@ Player* Actor::playerInRoom() {
 		int randPlayer = rand() % this->currentRoom->getPlayersInRoom().size();
 		return this->currentRoom->getPlayersInRoom()[randPlayer];
 	}
-	return (Player*) 0;
+	return nullptr;
 }
 
 Room* Actor::getRoom() {

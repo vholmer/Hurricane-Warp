@@ -10,7 +10,7 @@ Snilsson::Snilsson(string name, string description) {
 
 // Next level AI right here
 void Snilsson::act(Engine* engine) {
-	Player* weakPlayer;
+	Player* weakPlayer = this->weakestPlayer();
 	if(weakPlayer != nullptr) {
 		int damage = this->fight(weakPlayer);
 		engine->broadcastPlayerDamage(this, weakPlayer, damage);

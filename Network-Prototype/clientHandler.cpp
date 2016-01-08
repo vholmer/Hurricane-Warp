@@ -16,6 +16,28 @@ string ClientHandler::calculateIP(struct sockaddr_in &cli_addr) const {
 	return inet_ntoa(cli_addr.sin_addr);
 }
 
+int ClientHandler::OnStillThere() {
+	std::cout << "Server asked if  I am still here" << std::endl;
+	int n = SendInt((int)MessageCode::StillHere, socket);
+	return n;
+}
+
+int ClientHandler::OnStillHere() {
+	std::cout << "client is still there" << std::endl;
+	clientDead = false;
+	return 0;
+}
+
+int ClientHandler::OnConnectionLost() {
+	this->objectDead = true;
+	this->canSend = false;
+	std::cout << "End connection" << std::endl;
+	std::cout << "We are done here" << std::endl;
+	this->endConnection();
+	this->engine->setDisconnected(this);
+	return 0;
+}
+
 /*
 	The process that handles all output from the clienthandler
 */
@@ -76,8 +98,7 @@ void ClientHandler::inProcess(int socket) {
 		timeout.tv_sec = 5; // set timer to 5 sec
 		timeout.tv_usec = 0; // set return signal
    		
-   		int ret = select(socket + 1, &set, NULL,
-   		 NULL, &timeout);
+   		int ret = select(socket + 1, &set, NULL, NULL, &timeout);
 
    		if(ret != 0) {
    			clientDead = false;
@@ -109,40 +130,25 @@ void ClientHandler::HandleInput(int socket) {
 	MessageCode code = (MessageCode) read;
 	std::cout << "We got: " << read << std::endl;
 	MessageStruct* strc = NULL;
-	switch (code) {
-		case MessageCode::StillThere : {
-			std::cout << "Server asked if  I am still here" << std::endl;
-			SendInt((int)MessageCode::StillHere, socket);
-			break;
-			}
-		case MessageCode::StillHere : {
-			std::cout << "client is still there" << std::endl;
-			clientDead = false;
-			break;
-		}
-		case MessageCode::ConnectionLost : {
-			this->objectDead = true;
-			this->canSend = false;
-			std::cout << "End connection" << std::endl;
-			std::cout << "We are done here" << std::endl;
-			this->endConnection();
-			this->engine->setDisconnected(this);
-			break;
-			}
-		case MessageCode::MessageMessage : {
-			std::cout << "Message" << std::endl;
-			MessageStruct* tmp = new MessageStruct();
-			ReadMessageStruct(*tmp, socket);
-			std::cout << "Server said: " << std::endl;
-			std::cout << tmp->textSize << std::endl;
-			std::cout << tmp->text << std::endl; 
-			strc = tmp; 
-			break;
-			}
-		default : {
-			std::cout << "Protocol error" << std::endl;
-		}
+	auto pointer = funcmap.find(code);
+	if(pointer != funcmap.end()) {
+		std::cout << "Got a thing" <<std::endl;
+		int (ClientHandler::*funcPointer)() = (*pointer).second;
+		int ret = (this->*funcPointer)();
+		std::cout << "Done with things" <<std::endl;
+		//(*((*pointer).second))(); // Call method
+	} else if(code == MessageCode::MessageMessage){
+		std::cout << "Message" << std::endl;
+		MessageStruct* tmp = new MessageStruct();
+		ReadMessageStruct(*tmp, socket);
+		std::cout << "Server said: " << std::endl;
+		std::cout << tmp->textSize << std::endl;
+		std::cout << tmp->text << std::endl; 
+		strc = tmp; 
+	} else {
+		std::cout << "Protocol error" << std::endl;
 	}
+	
 	if(strc != NULL) {
 		engine->parseInput(this, std::string(strc->text));
 		delete strc;
@@ -157,6 +163,9 @@ ClientHandler::ClientHandler(Engine* engine) {
 	this->engine = engine;
 	this->objectDead = false;
 	this->canSend = true;
+	funcmap[MessageCode::StillHere] = &ClientHandler::OnStillHere;
+	funcmap[MessageCode::StillThere] = &ClientHandler::OnStillThere;
+	funcmap[MessageCode::ConnectionLost] = &ClientHandler::OnConnectionLost;
 }
 
 /*

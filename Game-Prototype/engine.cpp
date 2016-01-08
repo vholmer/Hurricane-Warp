@@ -66,11 +66,11 @@ void Engine::broadcastPlayerDamage(Actor* fromActor, Player* p, int dmg) {
 
 void Engine::clientManager() {
 	while(this->spin) {
-		disconMutex.lock();
-		checkMutex.lock();
+		std::lock_guard<std::mutex> lock1(disconMutex);
+		std::lock_guard<std::mutex> lock2(checkMutex);
 		usleep(100000);
 		for(ClientHandler* ch : this->disconList) {
-			globalMutex.lock();
+			std::lock_guard<std::mutex> lock3(globalMutex);
 			Player* p = this->clientToPlayer[ch];
 			p->dropAllItems(this);
 			for(Item* item : p->getInventory()) {
@@ -98,18 +98,14 @@ void Engine::clientManager() {
 			this->clientToPlayer.erase(ch);
 			delete ch;
 			delete p;
-			globalMutex.unlock();
 			break;
 		}
-		checkMutex.unlock();
-		disconMutex.unlock();
 	}
 }
 
 void Engine::setDisconnected(ClientHandler* ch) {
-	disconMutex.lock();
+	std::lock_guard<std::mutex> lock(disconMutex);
 	this->disconList.push_back(ch);
-	disconMutex.unlock();
 }
 
 void Engine::memHandle() {
@@ -153,42 +149,38 @@ void Engine::killConnections() {
 }
 
 void Engine::tickActors() {
-	cout << "1" << endl;
+	cout << "TICK 1" << endl;
 	while(this->spin) {
-		cout << "2" << endl;
+		cout << "TICK 2" << endl;
 		int sleepSeconds = (rand() % 7) + 6;
-		cout << "3" << endl;
+		cout << "TICK 3" << endl;
 		usleep(sleepSeconds * 1000 * 1000);
-		if(this->players.size() > 0) {
-			cout << "4" << endl;
-			checkMutex.lock();
-			cout << "5" << endl;
-			for(Actor* actor : this->roomHandler->npcMap) {
-				cout << "ACTLOOP 1" << endl;
-				actor->act(this);
-				cout << "ACTLOOP 2" << endl;
-			}
-			string daemon = "Daemon";
-			bool daemonAlive= false;
-			for(Actor* actor : this->roomHandler->npcMap) {
-				if(actor->getName() == daemon)
-					daemonAlive = true;
-			}
-			if(!daemonAlive) {
-				this->roomHandler->spawnDaemon(this);
-			}
-			cout << "6" << endl;
-			checkMutex.unlock();
-			this->checkActorHealth();
-			cout << "7" << endl;
-			this->checkPlayerHealth();
-			cout << "8" << endl;
+		cout << "TICK 4" << endl;
+		cout << "TICK 5" << endl;
+		for(Actor* actor : this->roomHandler->npcMap) {
+			cout << "ACTLOOP 1" << endl;
+			actor->act(this);
+			cout << "ACTLOOP 2" << endl;
 		}
+		string daemon = "Daemon";
+		bool daemonAlive= false;
+		for(Actor* actor : this->roomHandler->npcMap) {
+			if(actor->getName() == daemon)
+				daemonAlive = true;
+		}
+		if(!daemonAlive) {
+			this->roomHandler->spawnDaemon(this);
+		}
+		cout << "TICK 6" << endl;
+		this->checkActorHealth();
+		cout << "TICK 7" << endl;
+		this->checkPlayerHealth();
+		cout << "TICK 8" << endl;
 	}
 }
 
 void Engine::checkPlayerHealth() {
-	checkMutex.lock();
+	std::lock_guard<std::mutex> locker(checkMutex);
 	this->players.shrink_to_fit();
 	for(Player* p : this->players) {
 		ClientHandler* ch = this->playerToClient[p];
@@ -204,11 +196,10 @@ void Engine::checkPlayerHealth() {
 			p->setHealth(p->getMaxHealth());
 		}
 	}
-	checkMutex.unlock();
 }
 
 void Engine::checkActorHealth() {
-	checkMutex.lock();
+	std::lock_guard<std::mutex> locker(checkMutex);
 	vector<Actor*> toDelete;
 	for(int i = 0; i < this->roomHandler->npcMap.size(); ++i) {
 		Actor* actor = this->roomHandler->npcMap[i];
@@ -223,7 +214,6 @@ void Engine::checkActorHealth() {
 		}
 	}
 	this->roomHandler->npcMap.shrink_to_fit();
-	checkMutex.unlock();
 }
 
 void Engine::addPlayer(ClientHandler* c, string name) {
@@ -244,12 +234,11 @@ void Engine::addPlayer(ClientHandler* c, string name) {
 }
 
 void Engine::parseInput(ClientHandler* ch, string str) {
-	globalMutex.lock();
+	std::lock_guard<std::mutex> lock(globalMutex);
 	Player* p = this->clientToPlayer[ch];
 	parser->processCommand(p, ch, str);
 	this->checkActorHealth();
 	this->checkPlayerHealth();
-	globalMutex.unlock();
 }
 
 /*void Engine::startGameLoop() {

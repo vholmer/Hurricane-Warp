@@ -38,6 +38,8 @@ class ClientHandler {
 		string id;
 		string ip_adress;
 
+		std::map<MessageCode, int (ClientHandler::*)()> funcmap;
+
 		atomic<int> socket;
 
 
@@ -64,6 +66,13 @@ class ClientHandler {
 		void outProcess(int sock); // process which handles the input
 
 		void inProcess(int sock); // process which handles the output
+
+
+		int OnStillThere();
+
+		int OnStillHere();
+		
+		int OnConnectionLost();
 
 	public:
 
