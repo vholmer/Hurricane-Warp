@@ -64,6 +64,10 @@ void Parser::setUpLambdas(Player* p, ClientHandler* ch) {
 	};
 
 	this->funcMap[cmd::FIGHT] = [this, p, ch] (string secondWord = "") {
+		if(secondWord == "") {
+			ch->sendMessage(string("Fight who?\n> "));
+			return;
+		}
 		if(secondWord == toLowerCase(p->name)) {
 			ch->sendMessage(string("You cannot fight yourself!\n> "));
 			return;

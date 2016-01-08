@@ -9,7 +9,9 @@ struct Item {
 	string description;
 	string name;
 
-	Item(string description, string name);
+	int damage;
+
+	Item(string description, string name, int damage);
 };
 
 #endif

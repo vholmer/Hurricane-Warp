@@ -58,6 +58,8 @@ struct Player {
 
 	void dropAllItems(Engine* engine);
 
+	int getDamage();
+
 	void roomInfo(ClientHandler* ch);
 };
 

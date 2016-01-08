@@ -4,7 +4,7 @@ Player::Player() {
 	this->maxHealth = 20;
 	this->health = 20;
 	this->askedForName = false;
-	this->damageBase = 200;
+	this->damageBase = 5;
 }
 
 Room* Player::getRoomInDir(string dir) {
@@ -85,13 +85,13 @@ string Player::printInventory() {
 }
 
 int Player::fightPlayer(Player* p) {
-	int damage = rand() % damageBase + 1;
+	int damage = rand() % this->getDamage() + 1;
 	p->health -= damage;
 	return damage;
 }
 
 int Player::fightActor(Actor* a) {
-	int damage = rand() % damageBase + 1;
+	int damage = rand() % this->getDamage() + 1;
 	a->health -= damage;
 	return damage;
 }
@@ -130,6 +130,14 @@ void Player::dropAllItems(Engine* engine) {
 			break;
 		}
 	}
+}
+
+int Player::getDamage() {
+	int totalDamage = this->damageBase;
+	for(Item* item : this->inventory) {
+		totalDamage += item->damage;
+	}
+	return totalDamage;
 }
 
 void Player::roomInfo(ClientHandler* ch) {

@@ -16,14 +16,16 @@ RoomHandler::RoomHandler() {
 		"You are in a dark, twisted forest."
 		));
 	Item* chainSword = new Item(string("A furiously deadly chain sword."),
-		string("Chain-Sword")
+		string("Chain-Sword"),
+		20
 		);
 
 	Room* cliff = new Room(string(
 		"You are at the edge of a steep cliff, overlooking a warp-infested valley."
 		));
 	Item* caffeine = new Item(string("A sealed jar of caffeine."),
-		string("Caffeine")
+		string("Caffeine"),
+		0
 		);
 
 	Room* warp = new Room(string(
